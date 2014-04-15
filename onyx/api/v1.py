@@ -10,6 +10,7 @@ def newtab_click():
     return '', 201
 
 links = Blueprint('v1_links', __name__, url_prefix='/v1/links')
+
 @links.route('/newtab/impression', methods=['POST'])
 def newtab_impression():
     """
