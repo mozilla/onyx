@@ -4,18 +4,15 @@ from setuptools import setup, find_packages
 requires = [
         "Flask==0.10.1",
         "Flask-Script==0.6.7",
-        "Fabric==1.8.1",
         "gevent==1.0",
+        "gunicorn==18.0",
 ]
 
 if os.environ.has_key('MOZ_ONYX_DEV'):
     requires.extend([
         "ipython==2.0.0",
         "nose==1.3.0",
-    ])
-if os.environ.has_key('MOZ_ONYX_PROD'):
-    requires.extend([
-        "gunicorn==18.0",
+        "Fabric==1.8.1",
     ])
 
 setup(
