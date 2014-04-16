@@ -1,7 +1,8 @@
 import multiprocessing
 from onyx.webapp import create_app, setup_routes
 from flask.ext.script import Command, Option
-from gunicorn.app.base import Application
+from gunicorn.app.base import Application as GunicornApplication
+from gunicorn.config import Config as GunicornConfig
 
 def environment_manager_create(config):
     app = create_app(config)
@@ -22,12 +23,12 @@ class GunicornServerCommand(Command):
 
     def get_options(self):
         options = (
-            Option('-H', '--host', dest='host', type=str, default=self.host),
-            Option('-p', '--port', dest='port', type=int, default=self.port),
-            Option('-w', '--workers', dest='workers', type=int, default=self.workers),
-            Option('--access-logfile', dest='access_logfile', type=str, default=self.access_logfile),
-            Option('--max-requests', dest='max_requests', type=int, default=self.max_requests),
-            Option('--debug', dest='debug', type=bool, default=self.debug),
+            Option('-H', '--host', dest='host', type=str, default=self.host, help="hostname to bind server to"),
+            Option('-p', '--port', dest='port', type=int, default=self.port, help="port to bind server to"),
+            Option('-w', '--workers', dest='workers', type=int, default=self.workers, help="set the number of workers"),
+            Option('--access-logfile', dest='access_logfile', type=str, default=self.access_logfile, help="set the access log output location"),
+            Option('--max-requests', dest='max_requests', type=int, default=self.max_requests, help="set the maximum number of requests to serve before reloading"),
+            Option('--no-debug', dest='debug', action='store_false', default=self.debug, help="turn off debug mode"),
         )
         return options
 
@@ -36,8 +37,8 @@ class GunicornServerCommand(Command):
             workers = multiprocessing.cpu_count()
             max_requests = 0
 
-        class GunicornServer(Application):
-            def init(self, parser, opts, args):
+        class GunicornServer(GunicornApplication):
+            def init(self):
                 config = {
                     'bind': '{0}:{1}'.format(host, port),
                     'workers': workers,
@@ -49,4 +50,13 @@ class GunicornServerCommand(Command):
 
             def load(self):
                 return app
+
+            def load_config(self):
+                # Overriding to prevent Gunicorn from reading the command-line arguments
+                self.cfg = GunicornConfig(self.usage, prog=self.prog)
+                cfg = self.init()
+                if cfg and cfg is not None:
+                    for k, v in cfg.items():
+                        self.cfg.set(k.lower(), v)
+
         GunicornServer().run()
