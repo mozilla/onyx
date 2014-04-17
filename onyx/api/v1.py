@@ -2,7 +2,7 @@ from flask import current_app, Blueprint, request, redirect, jsonify
 
 links = Blueprint('v1_links', __name__, url_prefix='/v1/links')
 
-@links.route('/newtab/<locale>', methods=['GET'])
+@links.route('/newtab/<locale>', methods=['POST'])
 def newtab_serving(locale):
     """
     Given a locale, return locale-specific links if possible.
