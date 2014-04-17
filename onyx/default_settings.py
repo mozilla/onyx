@@ -16,4 +16,6 @@ class DefaultConfig(object):
     JSONIFY_PRETTYPRINT_REGULAR = True
 
     ENVIRONMENT = 'dev'
-    LINKS_LOCATION = '/static/directoryLinks.json'
+    LINKS_LOCALIZATIONS = {
+            'en-US': '/static/directoryLinks.json',
+    }
