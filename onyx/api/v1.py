@@ -1,5 +1,5 @@
 import uuid
-from flask import current_app, Blueprint, request, make_response, redirect, jsonify
+from flask import current_app, Blueprint, request, make_response, redirect, jsonify, session
 
 links = Blueprint('v1_links', __name__, url_prefix='/v1/links')
 
@@ -9,7 +9,7 @@ def newtab_serving(locale):
     Given a locale, return locale-specific links if possible.
     Set an identifier for a user if it isn't already set.
     """
-    user_id = request.cookies.get('uid')
+    user_id = session.get('uid')
     localized = current_app.config['LINKS_LOCALIZATIONS'].get(locale)
 
     response = None
@@ -23,7 +23,8 @@ def newtab_serving(locale):
 
     # set cookie if need be
     if not user_id:
-        response.set_cookie('uid', uuid.uuid4().hex)
+        session['uid'] = uuid.uuid4().hex
+        #TODO: save cookie
 
     return response
 
