@@ -20,7 +20,7 @@ class DefaultConfig(object):
     LINKS_LOCALIZATIONS = {
             'en-US': '/static/directoryLinks.json',
     }
-    COOKIE_MAX_AGE = ''
+    SESSION_MAX_AGE = 30
     ENCRYPTION = {
             'AES_KEY': PBKDF2(password='development-key-some-password', salt='development-salt-some-random-salt', dkLen=32, count=10000)
     }

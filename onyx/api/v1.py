@@ -1,5 +1,7 @@
 import uuid
 import json
+from datetime import datetime, timedelta
+import calendar
 from flask import current_app, Blueprint, request, make_response, redirect, jsonify, session
 from onyx.encryption import encrypt, decrypt
 
@@ -19,6 +21,7 @@ def newtab_serving(locale):
         if ciphertext and iv:
             data = json.loads(decrypt(ciphertext, iv))
             session_id = data['sid']
+            created = datetime.fromtimestamp(data['created'])
     except:
         return '', 400
 
@@ -33,10 +36,15 @@ def newtab_serving(locale):
     else:
         response = make_response(('', 204))
 
-    # set cookie if need be
-    if not session_id:
+    # (re)set cookie if need be
+    if not session_id or (created - datetime.utcnow() > timedelta(days=current_app.config['SESSION_MAX_AGE'])):
+        """
+        Generate a new session ciphertext and initialization vector
+        Set it in the current request session
+        """
         data = {
-            'sid': uuid.uuid4().hex
+            'sid': uuid.uuid4().hex,
+            'created': calendar.timegm(datetime.utcnow().timetuple())
         }
         ciphertext, iv = encrypt(json.dumps(data))
         session['ciphertext'] = ciphertext
