@@ -6,6 +6,7 @@ requires = [
         "Flask-Script==0.6.7",
         "gevent==1.0",
         "gunicorn==18.0",
+        "pycrypto==2.6.1",
 ]
 
 if os.environ.has_key('MOZ_ONYX_DEV'):

@@ -1,5 +1,7 @@
 import uuid
+import json
 from flask import current_app, Blueprint, request, make_response, redirect, jsonify, session
+from onyx.encryption import encrypt, decrypt
 
 links = Blueprint('v1_links', __name__, url_prefix='/v1/links')
 
@@ -9,7 +11,17 @@ def newtab_serving(locale):
     Given a locale, return locale-specific links if possible.
     Set an identifier for a user if it isn't already set.
     """
-    user_id = session.get('uid')
+    ciphertext = session.get('ciphertext')
+    iv = session.get('iv')
+
+    session_id = None
+    try:
+        if ciphertext and iv:
+            data = json.loads(decrypt(ciphertext, iv))
+            session_id = data['sid']
+    except:
+        return '', 400
+
     localized = current_app.config['LINKS_LOCALIZATIONS'].get(locale)
 
     response = None
@@ -22,9 +34,14 @@ def newtab_serving(locale):
         response = make_response(('', 204))
 
     # set cookie if need be
-    if not user_id:
-        session['uid'] = uuid.uuid4().hex
-        #TODO: save cookie
+    if not session_id:
+        data = {
+            'sid': uuid.uuid4().hex
+        }
+        ciphertext, iv = encrypt(json.dumps(data))
+        session['ciphertext'] = ciphertext
+        session['iv'] = iv
+        #TODO: save session id
 
     return response
 

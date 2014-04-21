@@ -1,4 +1,5 @@
 from datetime import timedelta
+from Crypto.Protocol.KDF import PBKDF2
 
 class DefaultConfig(object):
     """
@@ -18,4 +19,8 @@ class DefaultConfig(object):
     ENVIRONMENT = 'dev'
     LINKS_LOCALIZATIONS = {
             'en-US': '/static/directoryLinks.json',
+    }
+    COOKIE_MAX_AGE = ''
+    ENCRYPTION = {
+            'AES_KEY': PBKDF2(password='development-key-some-password', salt='development-salt-some-random-salt', dkLen=32, count=10000)
     }
