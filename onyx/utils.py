@@ -13,7 +13,7 @@ class GunicornServerCommand(Command):
     """
     Run the Onyx Server using gunicorn
     """
-    def __init__(self, host='127.0.0.1', port=5000, workers=1, access_logfile='-', max_requests=1, debug=True):
+    def __init__(self, host='127.0.0.1', port=5000, workers=1, access_logfile='-', max_requests=0, debug=True):
         self.host = host
         self.port = port
         self.workers = workers
