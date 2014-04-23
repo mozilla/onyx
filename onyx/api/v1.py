@@ -7,14 +7,20 @@ from onyx.encryption import encrypt, decrypt
 
 links = Blueprint('v1_links', __name__, url_prefix='/v1/links')
 
-@links.route('/newtab/<locale>', methods=['POST'])
-def newtab_serving(locale):
+@links.route('/newtab', methods=['POST'])
+def newtab_serving():
     """
     Given a locale, return locale-specific links if possible.
     Set an identifier for a user if it isn't already set.
     """
     ciphertext = session.get('ciphertext')
     iv = session.get('iv')
+
+    try:
+        client_payload = request.get_json(cache=False)
+        locale = client_payload['locale']
+    except:
+        return '', 400
 
     session_id = None
     try:
