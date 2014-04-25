@@ -2,7 +2,7 @@ import uuid
 import json
 from datetime import datetime, timedelta
 import calendar
-from flask import current_app, Blueprint, request, make_response, redirect, jsonify, session
+from flask import current_app, Blueprint, request, make_response, redirect, jsonify, session, Response
 from onyx.encryption import encrypt, decrypt
 
 links = Blueprint('v1_links', __name__, url_prefix='/v1/links')
@@ -20,16 +20,17 @@ def newtab_serving():
         client_payload = request.get_json(cache=False)
         locale = client_payload['locale']
     except:
-        return '', 400
+        return Response('', content_type='application/json; charset=utf-8', status=400)
 
     session_id = None
+    created = None
     try:
         if ciphertext and iv:
             data = json.loads(decrypt(ciphertext, iv))
             session_id = data['sid']
             created = datetime.fromtimestamp(data['created'])
     except:
-        return '', 400
+        return Response('', content_type='application/json; charset=utf-8', status=400)
 
     localized = current_app.config['LINKS_LOCALIZATIONS'].get(locale)
 
