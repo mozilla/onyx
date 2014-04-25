@@ -4,7 +4,7 @@ from flask.ext.script import Command, Option
 from gunicorn.app.base import Application as GunicornApplication
 from gunicorn.config import Config as GunicornConfig
 
-def environment_manager_create(config):
+def environment_manager_create(config=None):
     app = create_app(config)
     setup_routes(app)
     return app
