@@ -8,12 +8,13 @@ def create_app(config_filename):
     else:
         #TODO: read config in a format of choice. JSON?
         pass
+
+    if app.config['ENVIRONMENT'] not in app.config['STATIC_ENABLED_ENVS']:
+        app.config['STATIC_FOLDER'] = None
+
     return app
 
 def setup_routes(app):
     import onyx.api.v1
     onyx.api.v1.register_routes(app)
 
-    if app.config['DEBUG'] and app.config['ENVIRONMENT'] == 'dev':
-        # TODO: set static routes
-        pass
