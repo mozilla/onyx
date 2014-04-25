@@ -43,7 +43,7 @@ def newtab_serving():
         response = make_response(('', 204))
 
     # (re)set cookie if need be
-    if not session_id or (created - datetime.utcnow() > timedelta(days=current_app.config['SESSION_MAX_AGE'])):
+    if not session_id or (datetime.utcnow() - created > timedelta(days=current_app.config['SESSION_MAX_AGE'])):
         """
         Generate a new session ciphertext and initialization vector
         Set it in the current request session
