@@ -12,8 +12,10 @@ requires = [
 if os.environ.has_key('MOZ_ONYX_DEV'):
     requires.extend([
         "ipython==2.0.0",
-        "nose==1.3.0",
+        "nose==1.3.1",
         "Fabric==1.8.1",
+        "Flask-Testing==0.4.1",
+        "mock==1.0.1",
     ])
 
 setup(
