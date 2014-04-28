@@ -1,8 +1,10 @@
 from flask import Flask
+from flask_sslify import SSLify
 
 def create_app(config_filename):
     # TODO: forward proxy headers
     app = Flask(__name__)
+    SSLify(app, subdomains=True, permanent=True)
     if not config_filename:
         app.config.from_object('onyx.default_settings.DefaultConfig')
     else:
