@@ -6,8 +6,7 @@ def create_app(config_filename):
     if not config_filename:
         app.config.from_object('onyx.default_settings.DefaultConfig')
     else:
-        #TODO: read config in a format of choice. JSON?
-        pass
+        app.config.from_object(config_filename)
 
     if app.config['ENVIRONMENT'] not in app.config['STATIC_ENABLED_ENVS']:
         app.config['STATIC_FOLDER'] = None
