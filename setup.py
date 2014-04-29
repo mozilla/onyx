@@ -8,6 +8,7 @@ requires = [
         "gevent==1.0",
         "gunicorn==18.0",
         "pycrypto==2.6.1",
+        "heka-py==0.30.3",
 ]
 
 if os.environ.has_key('MOZ_ONYX_DEV'):

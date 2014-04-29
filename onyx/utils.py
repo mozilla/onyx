@@ -1,12 +1,32 @@
+import sys
 import multiprocessing
+import logging
 from onyx.webapp import create_app, setup_routes
 from flask.ext.script import Command, Option
 from gunicorn.app.base import Application as GunicornApplication
 from gunicorn.config import Config as GunicornConfig
+from heka.config import client_from_dict_config
+
+def setup_debug_logger(logger_name):
+    """
+    Setup a stdout logger for debug mode
+    """
+    fmt = logging.Formatter("HEKA: [%(asctime)-15s] %(message)s")
+    handler = logging.StreamHandler(sys.stdout)
+    handler.setFormatter(fmt)
+    logger = logging.getLogger(logger_name)
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
 
 def environment_manager_create(config=None):
+    """
+    Create and configure application
+    """
     app = create_app(config)
     setup_routes(app)
+    app.hekalog = client_from_dict_config(app.config['HEKA'])
+    if app.config['DEBUG']:
+        setup_debug_logger(app.config['HEKA']['logger'])
     return app
 
 class GunicornServerCommand(Command):

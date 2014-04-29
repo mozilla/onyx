@@ -25,3 +25,13 @@ class DefaultConfig(object):
     ENCRYPTION = {
             'AES_KEY': PBKDF2(password='development-key-some-password', salt='development-salt-some-random-salt', dkLen=32, count=10000)
     }
+
+    HEKA = {
+        'logger': 'onyx-{0}'.format(ENVIRONMENT),
+        'severity': 4,
+        'stream': {
+            'class': 'heka.streams.StdLibLoggingStream',
+            'logger_name': 'onyx-{0}'.format(ENVIRONMENT),
+        },
+        'encoder': 'heka.encoders.StdlibPayloadEncoder',
+    }

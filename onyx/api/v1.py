@@ -19,7 +19,8 @@ def newtab_serving():
     try:
         client_payload = request.get_json(cache=False)
         locale = client_payload['locale']
-    except:
+    except Exception, e:
+        current_app.hekalog.exception("payload_error")
         return Response('', content_type='application/json; charset=utf-8', status=400)
 
     session_id = None
@@ -29,7 +30,8 @@ def newtab_serving():
             data = json.loads(decrypt(ciphertext, iv))
             session_id = data['sid']
             created = datetime.fromtimestamp(data['created'])
-    except:
+    except Exception, e:
+        current_app.hekalog.exception("cookie_error")
         return Response('', content_type='application/json; charset=utf-8', status=400)
 
     localized = current_app.config['LINKS_LOCALIZATIONS'].get(locale)
@@ -49,14 +51,15 @@ def newtab_serving():
         Generate a new session ciphertext and initialization vector
         Set it in the current request session
         """
-        data = {
+        new_data = {
             'sid': uuid.uuid4().hex,
             'created': calendar.timegm(datetime.utcnow().timetuple())
         }
-        ciphertext, iv = encrypt(json.dumps(data))
+        ciphertext, iv = encrypt(json.dumps(new_data))
         session['ciphertext'] = ciphertext
         session['iv'] = iv
-        #TODO: save session id
+
+        current_app.hekalog.heka(type='serving', logger='session_change', payload=json.dumps({'ip': request.remote_addr, 'old': session_id, 'new': new_data['sid']}))
 
     return response
 

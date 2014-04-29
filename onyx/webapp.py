@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, current_app
 from flask_sslify import SSLify
 
 def create_app(config_filename):
@@ -16,6 +16,8 @@ def create_app(config_filename):
     return app
 
 def setup_routes(app):
-    import onyx.api.v1
-    onyx.api.v1.register_routes(app)
-
+    try:
+        import onyx.api.v1
+        onyx.api.v1.register_routes(app)
+    except Exception, e:
+        current_app.hekalog.exception(e)
