@@ -3,6 +3,7 @@ import json
 from datetime import datetime, timedelta
 import calendar
 from flask import current_app, Blueprint, request, make_response, redirect, jsonify, session, Response
+import onyx
 from onyx.encryption import encrypt, decrypt
 
 links = Blueprint('v1_links', __name__, url_prefix='/v1/links')
@@ -20,7 +21,7 @@ def newtab_serving():
         client_payload = request.get_json(cache=False)
         locale = client_payload['locale']
     except Exception, e:
-        current_app.hekalog.exception("payload_error")
+        onyx.hekalog.exception("payload_error")
         return Response('', content_type='application/json; charset=utf-8', status=400)
 
     session_id = None
@@ -31,7 +32,7 @@ def newtab_serving():
             session_id = data['sid']
             created = datetime.fromtimestamp(data['created'])
     except Exception, e:
-        current_app.hekalog.exception("cookie_error")
+        onyx.hekalog.exception("cookie_error")
         return Response('', content_type='application/json; charset=utf-8', status=400)
 
     localized = current_app.config['LINKS_LOCALIZATIONS'].get(locale)
@@ -59,7 +60,7 @@ def newtab_serving():
         session['ciphertext'] = ciphertext
         session['iv'] = iv
 
-        current_app.hekalog.heka(type='serving', logger='session_change', payload=json.dumps({'ip': request.remote_addr, 'old': session_id, 'new': new_data['sid']}))
+        onyx.hekalog.heka(type='serving', logger='session_change', payload=json.dumps({'ip': request.remote_addr, 'old': session_id, 'new': new_data['sid']}))
 
     return response
 

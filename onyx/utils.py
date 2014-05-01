@@ -1,11 +1,14 @@
 import sys
 import multiprocessing
 import logging
-from onyx.webapp import create_app, setup_routes
+from flask import Flask
+from flask_sslify import SSLify
 from flask.ext.script import Command, Option
 from gunicorn.app.base import Application as GunicornApplication
 from gunicorn.config import Config as GunicornConfig
 from heka.config import client_from_dict_config
+import onyx
+from onyx.webapp import setup_routes
 
 def setup_debug_logger(logger_name):
     """
@@ -18,14 +21,28 @@ def setup_debug_logger(logger_name):
     logger.addHandler(handler)
     logger.setLevel(logging.INFO)
 
+def create_app(config_filename):
+    # TODO: forward proxy headers
+    app = Flask(__name__)
+    SSLify(app, subdomains=True, permanent=True)
+    if not config_filename:
+        app.config.from_object('onyx.default_settings.DefaultConfig')
+    else:
+        app.config.from_object(config_filename)
+
+    if app.config['ENVIRONMENT'] not in app.config['STATIC_ENABLED_ENVS']:
+        app.config['STATIC_FOLDER'] = None
+
+    return app
+
 def environment_manager_create(config=None):
     """
     Create and configure application
     """
     app = create_app(config)
+    onyx.hekalog = client_from_dict_config(app.config['HEKA'])
     setup_routes(app)
-    app.hekalog = client_from_dict_config(app.config['HEKA'])
-    if app.config['DEBUG']:
+    if app.config['ENVIRONMENT'] == 'dev':
         setup_debug_logger(app.config['HEKA']['logger'])
     return app
 
