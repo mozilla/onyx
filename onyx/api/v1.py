@@ -9,6 +9,7 @@ from onyx.encryption import encrypt, decrypt
 links = Blueprint('v1_links', __name__, url_prefix='/v1/links')
 
 @links.route('/newtab', methods=['POST'])
+@onyx.hekalog.timer('newtab_serving')
 def newtab_serving():
     """
     Given a locale, return locale-specific links if possible.
@@ -43,6 +44,7 @@ def newtab_serving():
         # 303 hints to the client to always use GET for the redirect
         # ETag is handled by the directory link hosting server
         response = make_response(redirect(localized, code=303))
+        onyx.hekalog.heka(type='serving', logger='payload_served', payload=json.dumps({'ip': request.remote_addr, 'locale': locale}))
     else:
         response = make_response(('', 204))
 
