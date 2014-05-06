@@ -5,11 +5,13 @@ import calendar
 from flask import current_app, Blueprint, request, make_response, redirect, jsonify, session, Response
 import onyx
 from onyx.encryption import encrypt, decrypt
+from heka_raven.raven_plugin import capture_stack
 
 links = Blueprint('v1_links', __name__, url_prefix='/v1/links')
 
 @links.route('/newtab', methods=['POST'])
 @onyx.hekalog.timer('newtab_serving')
+@capture_stack
 def newtab_serving():
     """
     Given a locale, return locale-specific links if possible.
@@ -22,7 +24,7 @@ def newtab_serving():
         client_payload = request.get_json(cache=False)
         locale = client_payload['locale']
     except Exception, e:
-        onyx.hekalog.exception("payload_error")
+        onyx.hekalog.incr('payload_error', logger='watchlist', severity=3)
         return Response('', content_type='application/json; charset=utf-8', status=400)
 
     session_id = None
@@ -33,7 +35,7 @@ def newtab_serving():
             session_id = data['sid']
             created = datetime.fromtimestamp(data['created'])
     except Exception, e:
-        onyx.hekalog.exception("cookie_error")
+        onyx.hekalog.incr('cookie_error', logger='watchlist', severity=3)
         return Response('', content_type='application/json; charset=utf-8', status=400)
 
     localized = current_app.config['LINKS_LOCALIZATIONS'].get(locale)

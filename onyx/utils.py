@@ -7,6 +7,7 @@ from flask.ext.script import Command, Option
 from gunicorn.app.base import Application as GunicornApplication
 from gunicorn.config import Config as GunicornConfig
 from heka.config import client_from_dict_config
+from heka.holder import CLIENT_HOLDER
 import onyx
 from onyx.webapp import setup_routes
 
@@ -40,7 +41,8 @@ def environment_manager_create(config=None):
     Create and configure application
     """
     app = create_app(config)
-    onyx.hekalog = client_from_dict_config(app.config['HEKA'])
+    client = CLIENT_HOLDER.get_client(app.config['HEKA']['logger'])
+    onyx.hekalog = client_from_dict_config(app.config['HEKA'], client)
     setup_routes(app)
     if app.config['ENVIRONMENT'] == 'dev':
         setup_debug_logger(app.config['HEKA']['logger'])
