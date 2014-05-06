@@ -71,7 +71,8 @@ class GunicornServerCommand(Command):
         )
         return options
 
-    def handle(self, app, host, port, workers, access_logfile, max_requests, debug):
+    def run(self, host, port, workers, access_logfile, max_requests, debug):
+        from flask import current_app
         if not debug:
             workers = multiprocessing.cpu_count()
             max_requests = 0
@@ -88,7 +89,7 @@ class GunicornServerCommand(Command):
                 return config
 
             def load(self):
-                return app
+                return current_app
 
             def load_config(self):
                 # Overriding to prevent Gunicorn from reading the command-line arguments
