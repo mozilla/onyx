@@ -53,42 +53,48 @@ class GunicornServerCommand(Command):
     Run the Onyx Server using gunicorn
     """
     def __init__(self, host='127.0.0.1', port=5000, workers=1, access_logfile='-', max_requests=0, debug=True):
-        self.host = host
-        self.port = port
-        self.workers = workers
-        self.access_logfile = access_logfile
-        self.max_requests = max_requests
-        self.debug = debug
+        self.options = {
+            "host": host,
+            "port": port,
+            "workers": workers,
+            "access_logfile": access_logfile,
+            "max_requests": max_requests,
+            "debug": debug,
+        }
 
     def get_options(self):
         options = (
-            Option('-H', '--host', dest='host', type=str, default=self.host, help="hostname to bind server to"),
-            Option('-p', '--port', dest='port', type=int, default=self.port, help="port to bind server to"),
-            Option('-w', '--workers', dest='workers', type=int, default=self.workers, help="set the number of workers"),
-            Option('--access-logfile', dest='access_logfile', type=str, default=self.access_logfile, help="set the access log output location"),
-            Option('--max-requests', dest='max_requests', type=int, default=self.max_requests, help="set the maximum number of requests to serve before reloading"),
-            Option('--no-debug', dest='debug', action='store_false', default=self.debug, help="turn off debug mode"),
+            Option('-H', '--host', dest='host', type=str, default=self.options['host'], help="hostname to bind server to"),
+            Option('-p', '--port', dest='port', type=int, default=self.options['port'], help="port to bind server to"),
+            Option('-w', '--workers', dest='workers', type=int, default=self.options['workers'], help="set the number of workers"),
+            Option('--access-logfile', dest='access_logfile', type=str, default=self.options['access_logfile'], help="set the access log output location"),
+            Option('--max-requests', dest='max_requests', type=int, default=self.options['max_requests'], help="set the maximum number of requests to serve before reloading"),
+            Option('--no-debug', dest='debug', action='store_false', default=self.options['debug'], help="turn off debug mode"),
         )
         return options
 
-    def run(self, host, port, workers, access_logfile, max_requests, debug):
-        from flask import current_app
-        if not debug:
-            workers = multiprocessing.cpu_count()
-            max_requests = 0
+    def run(self, **kwargs):
+        self.options.update(kwargs)
+        if not kwargs.get('debug'):
+            self.options['workers'] = multiprocessing.cpu_count()
 
+        options = self.options
         class GunicornServer(GunicornApplication):
             def init(self):
                 config = {
-                    'bind': '{0}:{1}'.format(host, port),
-                    'workers': workers,
+                    'bind': '{0}:{1}'.format(
+                        options['host'],
+                        options['port']
+                    ),
+                    'workers': options['workers'],
                     'worker_class': 'gevent',
-                    'accesslog': access_logfile,
-                    'max_requests': max_requests,
+                    'accesslog': options['access_logfile'],
+                    'max_requests': options['max_requests'],
                 }
                 return config
 
             def load(self):
+                from flask import current_app
                 return current_app
 
             def load_config(self):
