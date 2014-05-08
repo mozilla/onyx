@@ -1,5 +1,5 @@
-import onyx
 from heka_raven.raven_plugin import capture_stack
+
 
 @capture_stack
 def setup_routes(app):

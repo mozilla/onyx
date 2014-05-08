@@ -3,6 +3,7 @@ from flask import current_app
 from Crypto.Cipher import AES
 from Crypto import Random
 
+
 def encrypt(message):
     """
     Encrypt a message using AES-CFB
@@ -14,6 +15,7 @@ def encrypt(message):
     cipher = AES.new(key, AES.MODE_CFB, iv)
     ciphertext = cipher.encrypt(message)
     return map(base64.b64encode, [ciphertext, iv])
+
 
 def decrypt(ciphertext, iv):
     """
