@@ -9,8 +9,9 @@ from gunicorn.config import Config as GunicornConfig
 from heka.config import client_from_dict_config
 from heka.holder import CLIENT_HOLDER
 import onyx
-from onyx.webapp import setup_routes
 
+
+APP_INSTANCE = None
 
 def setup_debug_logger(logger_name):
     """
@@ -43,13 +44,17 @@ def environment_manager_create(config=None):
     """
     Create and configure application
     """
-    app = create_app(config)
-    client = CLIENT_HOLDER.get_client(app.config['HEKA']['logger'])
-    onyx.hekalog = client_from_dict_config(app.config['HEKA'], client)
-    setup_routes(app)
-    if app.config['ENVIRONMENT'] == 'dev':
-        setup_debug_logger(app.config['HEKA']['logger'])
-    return app
+    global APP_INSTANCE
+    if not APP_INSTANCE:
+        app = create_app(config)
+        client = CLIENT_HOLDER.get_client(app.config['HEKA']['logger'])
+        onyx.hekalog = client_from_dict_config(app.config['HEKA'], client)
+        from onyx.webapp import setup_routes
+        setup_routes(app)
+        if app.config['ENVIRONMENT'] == 'dev':
+            setup_debug_logger(app.config['HEKA']['logger'])
+        APP_INSTANCE = app
+    return APP_INSTANCE
 
 
 class GunicornServerCommand(Command):
@@ -125,8 +130,9 @@ class GunicornServerCommand(Command):
                 return config
 
             def load(self):
-                from flask import current_app
-                return current_app
+                # Step needed to get around flask's import time side-effects
+                app = environment_manager_create()
+                return app
 
             def load_config(self):
                 # Overriding to prevent Gunicorn from reading
