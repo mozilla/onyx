@@ -111,7 +111,7 @@ class GunicornServerCommand(Command):
     def run(self, **kwargs):
         self.options.update(kwargs)
         if not kwargs.get('debug'):
-            self.options['workers'] = multiprocessing.cpu_count()
+            self.options['workers'] = multiprocessing.cpu_count() * 2 + 1
 
         options = self.options
 
