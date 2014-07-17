@@ -18,12 +18,9 @@ class DefaultConfig(object):
         'en-US': '/static/directoryLinks.json',
     }
 
-    HEKA = {
-        'logger': 'onyx-{0}'.format(ENVIRONMENT),
-        'severity': 4,
-        'stream': {
-            'class': 'heka.streams.StdLibLoggingStream',
-            'logger_name': 'onyx-{0}'.format(ENVIRONMENT),
-        },
-        'encoder': 'heka.encoders.StdlibPayloadEncoder',
+    STATSD = {
+            'host': 'localhost',
+            'port': 8125,
+            'sample_rate': 1,
+            'disabled': False
     }

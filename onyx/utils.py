@@ -1,60 +1,49 @@
 import sys
 import multiprocessing
 import logging
-from flask import Flask
-from flask_sslify import SSLify
+from functools import wraps
+from datetime import datetime
+
 from flask.ext.script import Command, Option
 from gunicorn.app.base import Application as GunicornApplication
 from gunicorn.config import Config as GunicornConfig
-from heka.config import client_from_dict_config
-from heka.holder import CLIENT_HOLDER
-import onyx
-
-
-APP_INSTANCE = None
-
-def setup_debug_logger(logger_name):
-    """
-    Setup a stdout logger for debug mode
-    """
-    fmt = logging.Formatter("HEKA: [%(asctime)-15s] %(message)s")
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setFormatter(fmt)
-    logger = logging.getLogger(logger_name)
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
-
-
-def create_app(config_filename):
-    # TODO: forward proxy headers
-    app = Flask(__name__)
-    SSLify(app, subdomains=True, permanent=True)
-    if not config_filename:
-        app.config.from_object('onyx.default_settings.DefaultConfig')
-    else:
-        app.config.from_object(config_filename)
-
-    if app.config['ENVIRONMENT'] not in app.config['STATIC_ENABLED_ENVS']:
-        app.config['STATIC_FOLDER'] = None
-
-    return app
+import statsd
+from onyx.environment import Environment
 
 
 def environment_manager_create(config=None):
     """
     Create and configure application
     """
-    global APP_INSTANCE
-    if not APP_INSTANCE:
-        app = create_app(config)
-        client = CLIENT_HOLDER.get_client(app.config['HEKA']['logger'])
-        onyx.hekalog = client_from_dict_config(app.config['HEKA'], client)
-        from onyx.webapp import setup_routes
-        setup_routes(app)
-        if app.config['ENVIRONMENT'] == 'dev':
-            setup_debug_logger(app.config['HEKA']['logger'])
-        APP_INSTANCE = app
-    return APP_INSTANCE
+    if config is None:
+        config = 'onyx.default_settings.DefaultConfig'
+    env = Environment.instance(config)
+    from onyx.webapp import setup_routes
+    setup_routes(env.application)
+
+    return env.application
+
+class RFC3339Formatter(logging.Formatter):
+    def formatTime(self, record, datefmt=None):
+        d = datetime.utcnow()
+        return d.strftime("%Y-%m-%dT%H:%M:%S") + "Z"
+
+def timed(namespace, timer_name, **kwargs):
+    """
+    A decorator to time the runtime of functions
+    @param      name    a name for this timer
+    """
+    def decorator(f):
+        @wraps(f)
+        def wrapper(**kwargs):
+            timer = statsd.Timer(namespace)
+            timer.start()
+            output = f()
+            timer.stop(timer_name)
+
+            return output
+        return wrapper
+    return decorator
 
 
 class GunicornServerCommand(Command):
