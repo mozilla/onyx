@@ -8,8 +8,8 @@ requires = [
     "gevent==1.0",
     "gunicorn==18.0",
     "pycrypto==2.6.1",
-    "heka-py==0.30.3",
-    "heka-py-raven[protocol_v3]",
+    "python-statsd==1.6.3",
+    "mock==1.0.1",
 ]
 
 if 'MOZ_ONYX_DEV' in os.environ:
@@ -19,12 +19,11 @@ if 'MOZ_ONYX_DEV' in os.environ:
         "flake8==2.1.0",
         "Flask-Testing==0.4.1",
         "Fabric==1.8.1",
-        "mock==1.0.1",
     ])
 
 setup(
     name="onyx",
-    version="0.1",
+    version="0.2",
     description="Link server and engagement metrics " +
                 "aggregator for Firefox Directory Links",
     author="Mozilla",

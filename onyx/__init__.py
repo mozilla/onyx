@@ -1,1 +1,0 @@
-hekalog = None
