@@ -12,7 +12,7 @@ class DefaultConfig(object):
     PREFERRED_URL_SCHEME = 'http'
     JSONIFY_PRETTYPRINT_REGULAR = True
 
-    STATIC_ENABLED_ENVS = {'dev', 'test'}
+    STATIC_ENABLED_ENVS = set(['dev', 'test'])
     ENVIRONMENT = 'dev'
     LINKS_LOCALIZATIONS = {
         'en-US': '/static/directoryLinks.json',
