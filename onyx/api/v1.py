@@ -23,9 +23,9 @@ counters = {
 links = Blueprint('v1_links', __name__, url_prefix='/v1/links')
 env = Environment.instance()
 
-@timed('v1', 'newtab_serving')
-@links.route('/newtab', methods=['POST'])
-def newtab_serving():
+@timed('v1', 'newtab_fetch')
+@links.route('/fetch', methods=['POST'])
+def newtab_fetch():
     """
     Given a locale, return locale-specific links if possible.
     Set an identifier for a user if it isn't already set.
