@@ -56,8 +56,6 @@ def newtab_serving():
 
     localized = current_app.config['LINKS_LOCALIZATIONS'].get(locale)
 
-    response = None
-
     if localized:
         # 303 hints to the client to always use GET for the redirect
         # ETag is handled by the directory link hosting server
