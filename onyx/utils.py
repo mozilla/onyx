@@ -26,6 +26,8 @@ def environment_manager_create(config=None):
         sys.path.append(path)
 
     if config is None:
+        # None will be passed by manage.py.
+        # A default param value will get overwritten, so this is implemented here.
         config = 'onyx.default_settings.DefaultConfig'
 
     config = os.environ.get('ONYX_SETTINGS', config)
