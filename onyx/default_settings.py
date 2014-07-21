@@ -7,7 +7,6 @@ class DefaultConfig(object):
     Configuration suitable for use for development
     """
     DEBUG = True
-    TESTING = False
     APPLICATION_ROOT = None
     PREFERRED_URL_SCHEME = 'http'
     JSONIFY_PRETTYPRINT_REGULAR = True
@@ -21,6 +20,4 @@ class DefaultConfig(object):
     STATSD = {
             'host': 'localhost',
             'port': 8125,
-            'sample_rate': 1,
-            'disabled': False
     }

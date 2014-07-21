@@ -21,7 +21,7 @@ class TestNewtabServing(BaseTestCase):
         """
         A call without a payload errors
         """
-        response = self.client.post(url_for('v1_links.newtab_serving'),
+        response = self.client.post(url_for('v1_links.fetch'),
                                     content_type='application/json')
         assert_equals(response.status_code, 400)
         assert_is_none(response.headers.get('Set-Cookie'))
@@ -31,7 +31,7 @@ class TestNewtabServing(BaseTestCase):
         """
         A call without a mimetype errors
         """
-        response = self.client.post(url_for('v1_links.newtab_serving'),
+        response = self.client.post(url_for('v1_links.fetch'),
                                     data=json.dumps({'locale': 'en-US', 'directoryCount': 1}))
         assert_equals(response.status_code, 400)
         assert_is_none(response.headers.get('Set-Cookie'))
@@ -41,7 +41,7 @@ class TestNewtabServing(BaseTestCase):
         """
         A call with an unknown locale yields an HTTP 204 response
         """
-        response = self.client.post(url_for('v1_links.newtab_serving'),
+        response = self.client.post(url_for('v1_links.fetch'),
                                     content_type='application/json',
                                     data=json.dumps({'locale': 'zh-CN', 'directoryCount': 1}))
         assert_equals(response.status_code, 204)
