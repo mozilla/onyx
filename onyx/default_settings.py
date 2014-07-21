@@ -8,7 +8,6 @@ class DefaultConfig(object):
     """
     DEBUG = True
     APPLICATION_ROOT = None
-    PREFERRED_URL_SCHEME = 'http'
     JSONIFY_PRETTYPRINT_REGULAR = True
 
     STATIC_ENABLED_ENVS = {'dev', 'test'}

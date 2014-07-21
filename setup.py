@@ -4,7 +4,6 @@ from setuptools import setup, find_packages
 requires = [
     "Flask==0.10.1",
     "Flask-Script==0.6.7",
-    "Flask-SSLify==0.1.4",
     "gevent==1.0",
     "gunicorn==18.0",
     "pycrypto==2.6.1",

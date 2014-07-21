@@ -3,7 +3,6 @@ import importlib
 import logging
 
 from flask import Flask
-from flask_sslify import SSLify
 from mock import Mock
 from statsd import StatsClient
 
@@ -86,7 +85,6 @@ class Environment(object):
 
         # Application server setup
         app = Flask('onyx')
-        SSLify(app, subdomains=True, permanent=True)
         app.config.from_object(self.__config_filename)
 
         if app.config['ENVIRONMENT'] not in app.config['STATIC_ENABLED_ENVS']:
