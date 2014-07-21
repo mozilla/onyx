@@ -1,5 +1,8 @@
+import sys
 import multiprocessing
 import logging
+import os
+from os.path import abspath, dirname
 from functools import wraps
 from datetime import datetime
 
@@ -10,12 +13,23 @@ import statsd
 from onyx.environment import Environment
 
 
+CONFIG_PATH_LOCATIONS = ['/etc/onyx', abspath(dirname(__file__))]
+
 def environment_manager_create(config=None):
     """
     Create and configure application
+    If not specified, the default config will be loaded.
+    If the ONYX_SETTINGS is provided, the file location will take precedence
     """
+
+    for path in CONFIG_PATH_LOCATIONS:
+        sys.path.append(path)
+
     if config is None:
         config = 'onyx.default_settings.DefaultConfig'
+
+    config = os.environ.get('ONYX_SETTINGS', config)
+
     env = Environment.instance(config)
     from onyx.webapp import setup_routes
     setup_routes(env.application)
