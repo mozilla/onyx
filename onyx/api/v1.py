@@ -9,7 +9,6 @@ from flask import (
     Response
 )
 from werkzeug.exceptions import BadRequest
-from onyx.utils import timed
 from onyx.environment import Environment
 
 

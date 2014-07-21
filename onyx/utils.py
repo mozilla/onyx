@@ -29,24 +29,6 @@ class RFC3339Formatter(logging.Formatter):
         return d.strftime("%Y-%m-%dT%H:%M:%S") + "Z"
 
 
-def timed(namespace, timer_name, **kwargs):
-    """
-    A decorator to time the runtime of functions
-    @param      name    a name for this timer
-    """
-    def decorator(f):
-        @wraps(f)
-        def wrapper(**kwargs):
-            timer = statsd.Timer(namespace)
-            timer.start()
-            output = f()
-            timer.stop(timer_name)
-
-            return output
-        return wrapper
-    return decorator
-
-
 class GunicornServerCommand(Command):
     """
     Run the Onyx Server using gunicorn
