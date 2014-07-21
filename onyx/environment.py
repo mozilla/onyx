@@ -5,7 +5,7 @@ import logging
 from flask import Flask
 from flask_sslify import SSLify
 from mock import Mock
-import statsd
+from statsd import StatsClient
 
 
 class EnvironmentUninitializedError(Exception): pass
@@ -17,11 +17,7 @@ class Environment(object):
         self.__config_filename = config_filename
         self.config = self.load_config_obj(config_filename)
         self.__application = None
-        self.__statsd_clients = {
-            'timer': None,
-            'counter': None,
-            'gauge': None
-        }
+        self.statsd = None
         self.init()
         if not hasattr(Environment, "_instance"):
             Environment._instance = self
@@ -39,7 +35,7 @@ class Environment(object):
 
     @property
     def is_test(self):
-        return self.config.TESTING
+        return self.config.ENVIRONMENT == "test"
 
     @property
     def is_development(self):
@@ -83,10 +79,10 @@ class Environment(object):
         ### logging
         if self.is_test:
             self.logger = Mock()
-            statsd.Connection.set_defaults(disabled=True)
+            self.statsd = Mock()
         else:
             self.logger = self._setup_logger()
-            statsd.Connection.set_defaults(**self.config.STATSD)
+            self.statsd = StatsClient(**self.config.STATSD)
 
         # Application server setup
         app = Flask('onyx')

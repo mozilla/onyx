@@ -10,9 +10,7 @@ requires = [
     "pycrypto==2.6.1",
     "python-statsd==1.6.3",
     "mock==1.0.1",
-    'statsd',
-    'Crypto',
-    'fabric',
+    "statsd==3.0",
 ]
 
 if 'MOZ_ONYX_DEV' in os.environ:
