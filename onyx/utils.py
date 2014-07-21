@@ -106,7 +106,7 @@ class GunicornServerCommand(Command):
         options = self.options
 
         class GunicornServer(GunicornApplication):
-            def init(self, **kwargses):
+            def init(self, **kwargs):
                 config = {
                     'bind': '{0}:{1}'.format(
                         options['host'],
