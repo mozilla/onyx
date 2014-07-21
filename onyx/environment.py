@@ -1,14 +1,15 @@
 import sys
 import importlib
 import logging
-import time
 
 from flask import Flask
 from flask_sslify import SSLify
 from mock import Mock
 import statsd
 
+
 class EnvironmentUninitializedError(Exception): pass
+
 
 class Environment(object):
 

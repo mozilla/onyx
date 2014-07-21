@@ -1,4 +1,3 @@
-import json
 from flask import (
     current_app,
     Blueprint,
@@ -32,14 +31,12 @@ def newtab_serving():
         client_payload = request.get_json(cache=False)
         locale = client_payload['locale']
         directory_count = client_payload['directoryCount']
-    except Exception, e:
+    except Exception:
         counters['fetch_error'] += 1
         return Response('', content_type='application/json; charset=utf-8',
                         status=400)
 
     localized = current_app.config['LINKS_LOCALIZATIONS'].get(locale)
-
-    response = None
 
     if localized:
         # 303 hints to the client to always use GET for the redirect

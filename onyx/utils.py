@@ -1,4 +1,3 @@
-import sys
 import multiprocessing
 import logging
 from functools import wraps
@@ -23,10 +22,12 @@ def environment_manager_create(config=None):
 
     return env.application
 
+
 class RFC3339Formatter(logging.Formatter):
     def formatTime(self, record, datefmt=None):
         d = datetime.utcnow()
         return d.strftime("%Y-%m-%dT%H:%M:%S") + "Z"
+
 
 def timed(namespace, timer_name, **kwargs):
     """
@@ -105,7 +106,7 @@ class GunicornServerCommand(Command):
         options = self.options
 
         class GunicornServer(GunicornApplication):
-            def init(self):
+            def init(self, **kwargses):
                 config = {
                     'bind': '{0}:{1}'.format(
                         options['host'],
