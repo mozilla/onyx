@@ -1,4 +1,5 @@
 import json
+import logging
 from flask import (
     current_app,
     Blueprint,
@@ -7,6 +8,7 @@ from flask import (
     redirect,
     Response
 )
+from werkzeug.exceptions import BadRequest
 import statsd
 from onyx.utils import timed
 from onyx.environment import Environment
@@ -28,11 +30,26 @@ def newtab_serving():
     Given a locale, return locale-specific links if possible.
     Set an identifier for a user if it isn't already set.
     """
+    reject = False
+
     try:
         client_payload = request.get_json(cache=False)
-        locale = client_payload['locale']
-        directory_count = client_payload['directoryCount']
-    except Exception, e:
+        locale = client_payload.get('locale')
+        directory_count = client_payload.get('directoryCount')
+
+        if locale is None:
+            env.log(logger="fetch", type="client_error", message="locale_missing", level=logging.WARN)
+            reject = True
+
+        if directory_count is None:
+            env.log(logger="fetch", type="client_error", message="directory_count_missing", level=logging.WARN)
+            reject = True
+
+    except BadRequest:
+        env.log(logger="fetch", type="client_error", message="malformed_payload", level=logging.WARN)
+        reject = True
+
+    if reject:
         counters['fetch_error'] += 1
         return Response('', content_type='application/json; charset=utf-8',
                         status=400)

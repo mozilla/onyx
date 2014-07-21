@@ -68,13 +68,12 @@ class Environment(object):
         logger.setLevel(logging.INFO)
         return logger
 
-    def log(self, type, logger, message, **kwargs):
+    def log(self, logger, type, message, level=logging.INFO):
         """
         Special formatter that logs messages in a format log parsers expects
         """
-        level = kwargs.get('level', logging.INFO)
-        msg = "{0} {1} {2}".format(type, logger, message)
-        self.logger.log(level, msg, **kwargs)
+        msg = " ".join([logger, type, message])
+        self.logger.log(level, msg)
 
     def init(self):
         """
