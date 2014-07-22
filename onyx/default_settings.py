@@ -20,3 +20,7 @@ class DefaultConfig(object):
             'host': 'localhost',
             'port': 8125,
     }
+
+    LOG_PATH = None
+    LOG_BACKUPS = 100
+    LOG_MAX_BYTES = 1*1024*1024

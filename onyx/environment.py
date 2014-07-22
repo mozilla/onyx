@@ -1,10 +1,10 @@
-import sys
 import importlib
 import logging
 
 from flask import Flask
 from mock import Mock
 from statsd import StatsClient
+from cloghandler import ConcurrentRotatingFileHandler
 
 
 class EnvironmentUninitializedError(Exception): pass
@@ -54,8 +54,13 @@ class Environment(object):
         """
         Setup and return a logger configured to return a timestamp in RFC3339 format
         The timestamp is always UTC
+        Logs go to stderr
         """
-        handler = logging.StreamHandler(sys.stdout)
+        if self.config.LOG_PATH:
+            handler = ConcurrentRotatingFileHandler(self.config.LOG_PATH, "a", self.config.LOG_MAX_BYTES, self.config.LOG_BACKUPS)
+        else:
+            handler = logging.StreamHandler()
+
         from onyx.utils import RFC3339Formatter
         fmt = RFC3339Formatter("%(asctime)-19s %(levelname)-8s %(message)s")
         handler.setFormatter(fmt)
