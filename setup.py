@@ -7,7 +7,6 @@ requires = [
     "gevent==1.0",
     "gunicorn==18.0",
     "pycrypto==2.6.1",
-    "python-statsd==1.6.3",
     "mock==1.0.1",
     "statsd==3.0",
     "ConcurrentLogHandler==0.9.1",
