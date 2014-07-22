@@ -24,7 +24,7 @@ if 'MOZ_ONYX_DEV' in os.environ:
 
 setup(
     name="onyx",
-    version="0.2",
+    version="1.0",
     description="Link server and engagement metrics " +
                 "aggregator for Firefox Directory Links",
     author="Mozilla",
