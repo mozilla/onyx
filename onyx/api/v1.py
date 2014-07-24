@@ -25,7 +25,7 @@ def fetch():
     reject = False
 
     try:
-        client_payload = request.get_json(cache=False, silent=False)
+        client_payload = request.get_json(force=True, cache=False, silent=False)
 
         if not client_payload:
             raise BadRequest()
@@ -42,6 +42,9 @@ def fetch():
             reject = True
 
     except BadRequest:
+        env.log(logger="fetch", type="client_error", message="malformed_payload", level=logging.WARN)
+        reject = True
+    except Exception:
         env.log(logger="fetch", type="client_error", message="malformed_payload", level=logging.WARN)
         reject = True
 
