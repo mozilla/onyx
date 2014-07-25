@@ -5,7 +5,7 @@ from distutils.util import strtobool
 from functools import wraps
 
 from fabric import colors
-from fabric.api import env, run, local, require, put, abort, sudo, settings
+from fabric.api import env, run, local, require, put, abort, sudo, settings, parallel, serial
 
 env.path = "/var/www/onyx"
 env.user = "root"
@@ -30,6 +30,7 @@ def section(f):
 ### Utility
 
 @section
+@parallel
 def upload_from_dist(run_setuptools=False):
     """
     Create zip, send over the wire and unzip
@@ -52,6 +53,7 @@ def upload_from_dist(run_setuptools=False):
 
 
 @section
+@serial
 def set_symlinks():
     require("release", provided_by=[deploy, deploy_cold])
     sudo("if [ -h %(path)s/previous ]; then rm %(path)s/previous; fi" % env, user=env.app_user)
@@ -60,6 +62,7 @@ def set_symlinks():
 
 
 @section
+@parallel
 def setup_virtualenv():
     require("release", provided_by=[deploy, deploy_cold])
     put("./setup-project.sh", "/tmp/" % env)
@@ -69,6 +72,7 @@ def setup_virtualenv():
 
 
 @section
+@parallel
 def clean_release_dir():
     """
     Delete releases if the number of releases to keep has gone beyond the threshold set by num_keep_releases
@@ -85,6 +89,7 @@ def clean_release_dir():
 ### Tasks
 
 @section
+@parallel
 def deploy_cold(run_setuptools):
     """
     Deploy code but don"t change current running version
@@ -94,6 +99,7 @@ def deploy_cold(run_setuptools):
 
 
 @section
+@parallel
 def deploy(run_setuptools=False):
     """
     Deploy code, set symlinks and restart supervisor
@@ -146,6 +152,7 @@ def flake(config="flake8.cfg"):
     local("flake8 . --config={}".format(config))
 
 
+@serial
 def package(clean=True):
     if to_bool(clean):
         local("rm -rf build/")
