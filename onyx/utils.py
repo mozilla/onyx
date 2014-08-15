@@ -42,7 +42,7 @@ def environment_manager_create(config=None):
 class RFC3339Formatter(logging.Formatter):
     def formatTime(self, record, datefmt=None):
         d = datetime.utcnow()
-        return d.strftime("%Y-%m-%dT%H:%M:%S") + "Z"
+        return d.isoformat() + "Z"
 
 
 class GunicornServerCommand(Command):
