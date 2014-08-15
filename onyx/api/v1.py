@@ -20,7 +20,6 @@ env = Environment.instance()
 def fetch():
     """
     Given a locale, return locale-specific links if possible.
-    Set an identifier for a user if it isn't already set.
     """
     reject = False
 
