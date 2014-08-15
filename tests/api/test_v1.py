@@ -27,12 +27,13 @@ class TestNewtabServing(BaseTestCase):
         assert_is_none(response.headers.get('Set-Cookie'))
         assert_equals(int(response.headers.get('Content-Length')), 0)
 
-    def test_missing_mime_type(self):
+    def test_missing_dircount(self):
         """
-        A call without a mimetype errors
+        A call without directoryCount errors
         """
         response = self.client.post(url_for('v1_links.fetch'),
-                                    data=json.dumps({'locale': 'en-US', 'directoryCount': 1}))
+                                    content_type='application/json',
+                                    data=json.dumps({'locale': 'en-US'}))
         assert_equals(response.status_code, 400)
         assert_is_none(response.headers.get('Set-Cookie'))
         assert_equals(int(response.headers.get('Content-Length')), 0)
@@ -43,6 +44,6 @@ class TestNewtabServing(BaseTestCase):
         """
         response = self.client.post(url_for('v1_links.fetch'),
                                     content_type='application/json',
-                                    data=json.dumps({'locale': 'zh-CN', 'directoryCount': 1}))
+                                    data=json.dumps({'locale': 'zh-CN', 'directoryCount': {"organic": 1}}))
         assert_equals(response.status_code, 204)
         assert_equals(int(response.headers.get('Content-Length')), 0)
