@@ -71,6 +71,10 @@ def fetch():
     return response
 
 def handle_ping(ping_type):
+    """
+    A ping handler that just logs the data it receives for further processing
+    in the backend
+    """
 
     reject = False
 
