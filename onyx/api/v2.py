@@ -90,6 +90,7 @@ def handle_ping(ping_type):
         env.log(logger=ping_type, type="client_error", message="malformed_payload", level=logging.WARN)
         reject = True
 
+
     if reject:
         env.statsd.incr("{0}".format(ping_type, "_error"))
         return Response('', content_type='application/json; charset=utf-8',
@@ -98,9 +99,13 @@ def handle_ping(ping_type):
     now = datetime.utcnow()
     date_str = now.date().isoformat()
     timestamp = calendar.timegm(now.timetuple())
+    ua = request.headers.get('User-Agent')
+    ip_addr = request.remote_addr
 
     client_payload["date"] = date_str
     client_payload["timestamp"] = timestamp
+    client_payload["ua"] = ua
+    client_payload["ip"] = ip_addr
 
     env.log(logger=ping_type, type="payload", message=json.dumps(client_payload))
 
