@@ -57,8 +57,7 @@ def fetch():
         response = make_response(redirect(localized, code=303))
         env.log(logger="fetch", type="served", message=" ".join([
             str(request.remote_addr),
-            locale,
-            json.dumps(directory_count)
+            locale
         ]))
         env.statsd.incr("fetch_success")
     else:
