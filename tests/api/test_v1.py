@@ -47,3 +47,12 @@ class TestNewtabServing(BaseTestCase):
                                     data=json.dumps({'locale': 'zh-CN', 'directoryCount': {"organic": 1}}))
         assert_equals(response.status_code, 204)
         assert_equals(int(response.headers.get('Content-Length')), 0)
+
+    def test_success(self):
+        """
+        A call with an unknown locale yields an HTTP 204 response
+        """
+        response = self.client.post(url_for('v2_links.fetch'),
+                                    content_type='application/json',
+                                    data=json.dumps({'locale': 'en-US', 'directoryCount': {'organic': 1}}))
+        assert_equals(response.status_code, 303)
