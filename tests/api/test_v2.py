@@ -22,7 +22,8 @@ class TestNewtabServing(BaseTestCase):
         A fetch call without a payload errors
         """
         response = self.client.post(url_for('v2_links.fetch'),
-                                    content_type='application/json')
+                                    content_type='application/json',
+                                    headers=[("User-Agent", "TestClient")])
         assert_equals(response.status_code, 400)
         assert_is_none(response.headers.get('Set-Cookie'))
         assert_equals(int(response.headers.get('Content-Length')), 0)
@@ -33,6 +34,7 @@ class TestNewtabServing(BaseTestCase):
         """
         response = self.client.post(url_for('v2_links.fetch'),
                                     content_type='application/json',
+                                    headers=[("User-Agent", "TestClient")],
                                     data=json.dumps({'locale': 'zh-CN'}))
         assert_equals(response.status_code, 204)
         assert_equals(int(response.headers.get('Content-Length')), 0)
@@ -43,6 +45,7 @@ class TestNewtabServing(BaseTestCase):
         """
         response = self.client.post(url_for('v2_links.fetch'),
                                     content_type='application/json',
+                                    headers=[("User-Agent", "TestClient")],
                                     data=json.dumps({'locale': 'en-US'}))
         assert_equals(response.status_code, 303)
 
@@ -53,7 +56,8 @@ class TestClickPing(BaseTestCase):
         A click ping call without a payload errors
         """
         response = self.client.post(url_for('v2_links.click'),
-                                    content_type='application/json')
+                                    content_type='application/json',
+                                    headers=[("User-Agent", "TestClient")])
         assert_equals(response.status_code, 400)
 
     def test_empty_payload(self):
@@ -62,6 +66,7 @@ class TestClickPing(BaseTestCase):
         """
         response = self.client.post(url_for('v2_links.click'),
                                     content_type='application/json',
+                                    headers=[("User-Agent", "TestClient")],
                                     data=json.dumps({}))
         assert_equals(response.status_code, 400)
 
@@ -71,6 +76,7 @@ class TestClickPing(BaseTestCase):
         """
         response = self.client.post(url_for('v2_links.click'),
                                     content_type='application/json',
+                                    headers=[("User-Agent", "TestClient")],
                                     data=json.dumps({"data":"test"}))
         assert_equals(response.status_code, 200)
         assert_equals(int(response.headers.get('Content-Length')), 0)
@@ -82,7 +88,8 @@ class TestViewPing(BaseTestCase):
         A view ping call without a payload errors
         """
         response = self.client.post(url_for('v2_links.view'),
-                                    content_type='application/json')
+                                    content_type='application/json',
+                                    headers=[("User-Agent", "TestClient")])
         assert_equals(response.status_code, 400)
 
     def test_empty_payload(self):
@@ -91,6 +98,7 @@ class TestViewPing(BaseTestCase):
         """
         response = self.client.post(url_for('v2_links.view'),
                                     content_type='application/json',
+                                    headers=[("User-Agent", "TestClient")],
                                     data=json.dumps({}))
         assert_equals(response.status_code, 400)
 
@@ -100,6 +108,7 @@ class TestViewPing(BaseTestCase):
         """
         response = self.client.post(url_for('v2_links.view'),
                                     content_type='application/json',
+                                    headers=[("User-Agent", "TestClient")],
                                     data=json.dumps({"data": "test"}))
         assert_equals(response.status_code, 200)
         assert_equals(int(response.headers.get('Content-Length')), 0)

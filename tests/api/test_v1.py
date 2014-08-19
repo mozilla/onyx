@@ -22,7 +22,8 @@ class TestNewtabServing(BaseTestCase):
         A call without a payload errors
         """
         response = self.client.post(url_for('v1_links.fetch'),
-                                    content_type='application/json')
+                                    content_type='application/json',
+                                    headers=[("User-Agent", "TestClient")])
         assert_equals(response.status_code, 400)
         assert_is_none(response.headers.get('Set-Cookie'))
         assert_equals(int(response.headers.get('Content-Length')), 0)
@@ -33,6 +34,7 @@ class TestNewtabServing(BaseTestCase):
         """
         response = self.client.post(url_for('v1_links.fetch'),
                                     content_type='application/json',
+                                    headers=[("User-Agent", "TestClient")],
                                     data=json.dumps({'locale': 'en-US'}))
         assert_equals(response.status_code, 400)
         assert_is_none(response.headers.get('Set-Cookie'))
@@ -44,6 +46,7 @@ class TestNewtabServing(BaseTestCase):
         """
         response = self.client.post(url_for('v1_links.fetch'),
                                     content_type='application/json',
+                                    headers=[("User-Agent", "TestClient")],
                                     data=json.dumps({'locale': 'zh-CN', 'directoryCount': {"organic": 1}}))
         assert_equals(response.status_code, 204)
         assert_equals(int(response.headers.get('Content-Length')), 0)
@@ -54,5 +57,6 @@ class TestNewtabServing(BaseTestCase):
         """
         response = self.client.post(url_for('v2_links.fetch'),
                                     content_type='application/json',
+                                    headers=[("User-Agent", "TestClient")],
                                     data=json.dumps({'locale': 'en-US', 'directoryCount': {'organic': 1}}))
         assert_equals(response.status_code, 303)
