@@ -1,4 +1,3 @@
-import json
 import logging
 from flask import (
     current_app,
@@ -99,7 +98,7 @@ def handle_ping(ping_type):
         ua = request.headers.get('User-Agent')
         client_payload = request.get_json(force=True, cache=False, silent=False)
 
-        if not client_payload and type(client_payload) == dict:
+        if not client_payload:
             raise BadRequest()
 
     except Exception:
@@ -109,10 +108,7 @@ def handle_ping(ping_type):
             "locale": locale,
             "ver": "2",
         })
-        reject = True
 
-
-    if reject:
         env.statsd.incr("{0}".format(ping_type, "_error"))
         return Response('', content_type='application/json; charset=utf-8',
                         status=400)
