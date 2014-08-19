@@ -1,3 +1,4 @@
+import sys
 from datetime import datetime
 import importlib
 import logging
@@ -85,8 +86,10 @@ class Environment(object):
         message['date'] = now.date().isoformat()
         message['timestamp'] = int(unix_time_millis(now))
 
-        # in syslog message starts after first colon
-        msg = ":{0}".format(json.dumps(message))
+        msg = json.dumps(message)
+        if sys.platform == "darwin":
+            # in BSD syslog, message starts after first colon
+            msg = ":{0}".format(msg)
         logger.log(level, msg, **kwargs)
 
     def init(self):
