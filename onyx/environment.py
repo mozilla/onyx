@@ -1,10 +1,11 @@
+from datetime import datetime
 import importlib
 import logging
+import json
 
 from flask import Flask
 from mock import Mock
 from statsd import StatsClient
-from cloghandler import ConcurrentRotatingFileHandler
 
 
 class EnvironmentUninitializedError(Exception): pass
@@ -50,31 +51,43 @@ class Environment(object):
             raise EnvironmentUninitializedError("Cannot obtain application without initializing environment")
         return self.__application
 
-    def _setup_logger(self):
+    def __setup_loggers(self):
         """
-        Setup and return a logger configured to return a timestamp in RFC3339 format
-        The timestamp is always UTC
-        Logs go to stderr
+        Setup and return a loggers configured for offline processing
         """
-        if self.config.LOG_PATH:
-            handler = ConcurrentRotatingFileHandler(self.config.LOG_PATH, "a", self.config.LOG_MAX_BYTES, self.config.LOG_BACKUPS)
-        else:
-            handler = logging.StreamHandler()
+        loggers = {}
+        for name, settings in self.config.LOG_HANDLERS.iteritems():
+            internal_name = "onyx-{0}".format(name)
 
-        from onyx.utils import RFC3339Formatter
-        fmt = RFC3339Formatter("%(asctime)-19s %(levelname)-8s %(message)s")
-        handler.setFormatter(fmt)
-        logger = logging.getLogger('onyx')
-        logger.addHandler(handler)
-        logger.setLevel(logging.INFO)
-        return logger
+            handler = settings['handler'](**settings['params'])
+            if 'format' in settings:
+                handler.setFormatter(logging.Formatter(settings['format']))
 
-    def log(self, logger, type, message, level=logging.INFO):
+            logger = logging.getLogger(internal_name)
+            logger.setLevel(settings['level'])
+            logger.addHandler(handler)
+            loggers[internal_name] = logger
+        return loggers
+
+    def log_dict(self, name, message, action=None, **kwargs):
         """
-        Special formatter that logs messages in a format log parsers expects
+        Special formatter that logs messages in a format log parsers expects.
+        Requires a dict input
         """
-        msg = " ".join([logger, type, message])
-        self.logger.log(level, msg)
+        level = kwargs.pop('level', logging.INFO)
+        internal_name = "onyx-{0}".format(name)
+        logger = self.__loggers.get(internal_name, self.__loggers['onyx-console'])
+
+        from onyx.utils import unix_time_millis
+        now = datetime.utcnow()
+        if action:
+            message['action'] = action
+        message['date'] = now.date().isoformat()
+        message['timestamp'] = int(unix_time_millis(now))
+
+        # in syslog message starts after first colon
+        msg = ":{0}".format(json.dumps(message))
+        logger.log(level, msg, **kwargs)
 
     def init(self):
         """
@@ -82,10 +95,10 @@ class Environment(object):
         """
         ### logging
         if self.is_test:
-            self.logger = Mock()
+            self.log_dict = Mock()
             self.statsd = Mock()
         else:
-            self.logger = self._setup_logger()
+            self.__loggers = self.__setup_loggers()
             self.statsd = StatsClient(**self.config.STATSD)
 
         # Application server setup

@@ -1,7 +1,5 @@
 import json
 import logging
-from datetime import datetime
-import calendar
 from flask import (
     current_app,
     Blueprint,
@@ -24,8 +22,13 @@ def fetch():
     Given a locale, return locale-specific links if possible.
     """
     reject = False
+    ip_addr = None
+    ua = None
+    locale = None
 
     try:
+        ip_addr = request.remote_addr
+        ua = request.headers.get('User-Agent')
         client_payload = request.get_json(force=True, cache=False, silent=False)
 
         if not client_payload:
@@ -34,14 +37,21 @@ def fetch():
         locale = client_payload.get('locale')
 
         if locale is None:
-            env.log(logger="fetch", type="client_error", message="locale_missing", level=logging.WARN)
+            env.log_dict(name="client_error", action="fetch_locale_missing", level=logging.WARN, message={
+                "ip": ip_addr,
+                "ua": ua,
+                "locale": locale,
+                "ver": "2",
+            })
             reject = True
 
-    except BadRequest:
-        env.log(logger="fetch", type="client_error", message="malformed_payload", level=logging.WARN)
-        reject = True
     except Exception:
-        env.log(logger="fetch", type="client_error", message="malformed_payload", level=logging.WARN)
+        env.log_dict(name="client_error", action="fetch_malformed_payload", level=logging.WARN, message={
+            "ip": ip_addr,
+            "ua": ua,
+            "locale": locale,
+            "ver": "2",
+        })
         reject = True
 
     if reject:
@@ -55,17 +65,21 @@ def fetch():
         # 303 hints to the client to always use GET for the redirect
         # ETag is handled by the directory link hosting server
         response = make_response(redirect(localized, code=303))
-        env.log(logger="fetch", type="served", message=" ".join([
-            str(request.remote_addr),
-            locale
-        ]))
+        env.log_dict(name="application", action="fetch_served", message={
+            "ip": ip_addr,
+            "ua": ua,
+            "locale": locale,
+            "ver": "2",
+        })
         env.statsd.incr("fetch_success")
     else:
         response = make_response(('', 204))
-        env.log(logger="fetch", type="locale_unavailable", message=" ".join([
-            str(request.remote_addr),
-            locale
-        ]))
+        env.log_dict(name="application", action="fetch_locale_unavailable", message={
+            "ip": ip_addr,
+            "ua": ua,
+            "locale": locale,
+            "ver": "2",
+        })
         env.statsd.incr("fetch_locale_unavailable")
 
     return response
@@ -75,19 +89,26 @@ def handle_ping(ping_type):
     A ping handler that just logs the data it receives for further processing
     in the backend
     """
-
     reject = False
+    ip_addr = None
+    ua = None
+    locale = None
 
     try:
+        ip_addr = request.remote_addr
+        ua = request.headers.get('User-Agent')
         client_payload = request.get_json(force=True, cache=False, silent=False)
 
         if not client_payload and type(client_payload) == dict:
             raise BadRequest()
-    except BadRequest:
-        env.log(logger=ping_type, type="client_error", message="malformed_payload", level=logging.WARN)
-        reject = True
+
     except Exception:
-        env.log(logger=ping_type, type="client_error", message="malformed_payload", level=logging.WARN)
+        env.log_dict(name="client_error", action="{0}_malformed_payload".format(ping_type), level=logging.WARN, message={
+            "ip": ip_addr,
+            "ua": ua,
+            "locale": locale,
+            "ver": "2",
+        })
         reject = True
 
 
@@ -96,18 +117,10 @@ def handle_ping(ping_type):
         return Response('', content_type='application/json; charset=utf-8',
                         status=400)
 
-    now = datetime.utcnow()
-    date_str = now.date().isoformat()
-    timestamp = calendar.timegm(now.timetuple())
-    ua = request.headers.get('User-Agent')
-    ip_addr = request.remote_addr
-
-    client_payload["date"] = date_str
-    client_payload["timestamp"] = timestamp
     client_payload["ua"] = ua
     client_payload["ip"] = ip_addr
 
-    env.log(logger=ping_type, type="payload", message=json.dumps(client_payload))
+    env.log_dict(name="user_event", message=client_payload)
 
     return Response('', content_type='application/json; charset=utf-8',
                     status=200)

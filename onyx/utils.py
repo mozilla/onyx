@@ -38,12 +38,18 @@ def environment_manager_create(config=None):
 
     return env.application
 
+def unix_time(dt):
+    epoch = datetime.utcfromtimestamp(0)
+    delta = dt - epoch
+    return delta.total_seconds()
 
-class RFC3339Formatter(logging.Formatter):
-    def formatTime(self, record, datefmt=None):
-        d = datetime.utcnow()
-        return d.isoformat() + "Z"
+def unix_time_millis(dt):
+    return unix_time(dt) * 1000.0
 
+def utcnow_millis(dt=None):
+    if not dt:
+        dt = datetime.utcnow()
+    return unix_time_millis(datetime.utcnow())
 
 class GunicornServerCommand(Command):
     """

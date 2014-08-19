@@ -1,5 +1,7 @@
-from datetime import timedelta
-from Crypto.Protocol.KDF import PBKDF2
+import sys
+import logging
+import logging.handlers
+import socket
 
 
 class DefaultConfig(object):
@@ -21,6 +23,40 @@ class DefaultConfig(object):
             'port': 8125,
     }
 
-    LOG_PATH = None
-    LOG_BACKUPS = 100
-    LOG_MAX_BYTES = 1*1024*1024
+    LOG_HANDLERS = {
+            'application': {
+                'handler': logging.handlers.SysLogHandler,
+                'level': logging.INFO,
+                'params': {
+                    'address': "/var/run/syslog",
+                    'facility': logging.handlers.SysLogHandler.LOG_LOCAL0,
+                    'socktype': socket.SOCK_DGRAM,
+                }
+            },
+            'client_error': {
+                'handler': logging.handlers.SysLogHandler,
+                'level': logging.INFO,
+                'params': {
+                    'address': "/var/run/syslog",
+                    'facility': logging.handlers.SysLogHandler.LOG_LOCAL1,
+                    'socktype': socket.SOCK_DGRAM,
+                }
+            },
+            'user_event': {
+                'handler': logging.handlers.SysLogHandler,
+                'format': '%(message)s',
+                'level': logging.INFO,
+                'params': {
+                    'address': "/var/run/syslog",
+                    'facility': logging.handlers.SysLogHandler.LOG_LOCAL2,
+                    'socktype': socket.SOCK_DGRAM,
+                }
+            },
+            'console': {
+                'handler': logging.StreamHandler,
+                'level': logging.DEBUG,
+                'params': {
+                    'stream': sys.stdout
+                }
+            },
+    }
