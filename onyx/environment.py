@@ -1,7 +1,7 @@
-import sys
 from datetime import datetime
 import importlib
 import logging
+import logging.handlers
 import json
 
 from flask import Flask
@@ -87,8 +87,8 @@ class Environment(object):
         message['timestamp'] = int(unix_time_millis(now))
 
         msg = json.dumps(message)
-        if sys.platform == "darwin":
-            # in BSD syslog, message starts after first colon
+        if self.config.LOG_HANDLERS[name]['handler'] == logging.handlers.SysLogHandler:
+            # in syslog, message starts after first colon
             msg = ":{0}".format(msg)
         logger.log(level, msg, **kwargs)
 
