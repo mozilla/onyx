@@ -9,6 +9,7 @@ requires = [
     "pycrypto==2.6.1",
     "mock==1.0.1",
     "statsd==3.0",
+    'ujson',
 ]
 
 if 'MOZ_ONYX_DEV' in os.environ:

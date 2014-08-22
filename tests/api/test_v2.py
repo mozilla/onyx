@@ -1,17 +1,9 @@
 import json
-from copy import deepcopy
-from datetime import datetime, timedelta
-import calendar
-from onyx.encryption import encrypt, decrypt
 from flask import url_for
-from flask.sessions import SecureCookieSessionInterface
 from nose.tools import (
     assert_equals,
-    assert_is_not_none,
     assert_is_none,
-    assert_not_equals
 )
-from werkzeug.http import parse_cookie
 from tests.base import BaseTestCase
 
 
@@ -39,6 +31,17 @@ class TestNewtabServing(BaseTestCase):
         assert_equals(response.status_code, 204)
         assert_equals(int(response.headers.get('Content-Length')), 0)
 
+    def test_empty_payload(self):
+        """
+        A call with an empty empty json errors out b/c no locale is present
+        """
+        response = self.client.post(url_for('v2_links.fetch'),
+                                    content_type='application/json',
+                                    headers=[("User-Agent", "TestClient")],
+                                    data=json.dumps({}))
+        assert_equals(response.status_code, 400)
+        assert_equals(int(response.headers.get('Content-Length')), 0)
+
     def test_success(self):
         """
         A call with an unknown locale yields an HTTP 204 response
@@ -48,6 +51,7 @@ class TestNewtabServing(BaseTestCase):
                                     headers=[("User-Agent", "TestClient")],
                                     data=json.dumps({'locale': 'en-US'}))
         assert_equals(response.status_code, 303)
+
 
 class TestClickPing(BaseTestCase):
 
@@ -62,13 +66,13 @@ class TestClickPing(BaseTestCase):
 
     def test_empty_payload(self):
         """
-        A click ping call with an empty payload errors
+        A click ping call with an empty payload should pass
         """
         response = self.client.post(url_for('v2_links.click'),
                                     content_type='application/json',
                                     headers=[("User-Agent", "TestClient")],
                                     data=json.dumps({}))
-        assert_equals(response.status_code, 400)
+        assert_equals(response.status_code, 200)
 
     def test_payload_meta(self):
         """
@@ -81,6 +85,7 @@ class TestClickPing(BaseTestCase):
         assert_equals(response.status_code, 200)
         assert_equals(int(response.headers.get('Content-Length')), 0)
 
+
 class TestViewPing(BaseTestCase):
 
     def test_missing_payload(self):
@@ -92,14 +97,14 @@ class TestViewPing(BaseTestCase):
                                     headers=[("User-Agent", "TestClient")])
         assert_equals(response.status_code, 400)
 
-    def test_empty_payload(self):
+    def test_junk_payload(self):
         """
-        A view ping call with an empty payload errors
+        A view ping with valid json, but illegal payload (not a dict) errors
         """
         response = self.client.post(url_for('v2_links.view'),
                                     content_type='application/json',
                                     headers=[("User-Agent", "TestClient")],
-                                    data=json.dumps({}))
+                                    data='"hfdsfdsjkl"')
         assert_equals(response.status_code, 400)
 
     def test_payload_meta(self):

@@ -2,7 +2,7 @@ from datetime import datetime
 import importlib
 import logging
 import logging.handlers
-import json
+import ujson
 
 from flask import Flask
 from mock import Mock
@@ -86,7 +86,7 @@ class Environment(object):
         message['date'] = now.date().isoformat()
         message['timestamp'] = int(unix_time_millis(now))
 
-        msg = json.dumps(message)
+        msg = ujson.dumps(message)
         if self.config.LOG_HANDLERS[name]['handler'] == logging.handlers.SysLogHandler:
             # in syslog, message starts after first colon
             msg = ":{0}".format(msg)
@@ -111,7 +111,6 @@ class Environment(object):
         if app.config['ENVIRONMENT'] not in app.config['STATIC_ENABLED_ENVS']:
             app.config['STATIC_FOLDER'] = None
         self.__application = app
-
         return app
 
     @classmethod
