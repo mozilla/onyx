@@ -26,7 +26,10 @@ def fetch():
     locale = None
 
     try:
-        ip_addr = request.remote_addr
+        ip_addr = request.headers.get('X-Forwarded-For')
+        if ip_addr == None:
+            ip_addr = request.remote_addr
+
         ua = request.headers.get('User-Agent')
         raw_client_payload = request.get_data(cache=False)
         client_payload = ujson.decode(raw_client_payload)
@@ -82,7 +85,11 @@ def handle_ping(ping_type):
     try:
         client_payload_raw = request.get_data(cache=False)
         client_payload = ujson.decode(client_payload_raw)
-        ip_addr = request.remote_addr
+        
+        ip_addr = request.headers.get('X-Forwarded-For')
+        if ip_addr == None:
+            ip_addr = request.remote_addr
+            
         ua = request.headers.get('User-Agent')
         client_payload["ua"] = ua
         client_payload["ip"] = ip_addr
