@@ -9,7 +9,7 @@ from mock import Mock
 from statsd import StatsClient
 import geoip2.database
 import gevent
-import os
+import os, sys
 
 class EnvironmentUninitializedError(Exception):
     pass
@@ -141,14 +141,16 @@ class Environment(object):
 
 def _read_tile_index_loop(env):
     """wait for 15 minutes (greenlet), then open tile index file and replace LINKS_LOCALIZATIONS"""
-    try:
-        with open(os.path.join(env.config.TILE_INDEX_DIR, env.config.TILE_INDEX_FILE), "r") as fp:
-            data = fp.readall()
-            env.config.LINKS_LOCALIZATIONS = ujson.decode(data)
-        gevent.sleep(15 * 60)
-    except Exception as e:
-        pass
-        # TODO: do we have a log for error messages somewhere?
+    while True:
+        try:
+            with open(os.path.join(env.config.TILE_INDEX_DIR, env.config.TILE_INDEX_FILE), "r") as fp:
+                data = fp.readall()
+                env.config.LINKS_LOCALIZATIONS = ujson.decode(data)
+            # print "shit, y'all"
+            gevent.sleep(15 * 60)
+        except Exception as e:
+            print >> sys.stderr, "Error in gevent tiles loop: %s" % e
+            gevent.sleep(5)
 
 
 
