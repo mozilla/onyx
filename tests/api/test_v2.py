@@ -31,6 +31,18 @@ class TestNewtabServing(BaseTestCase):
         assert_equals(response.status_code, 204)
         assert_equals(int(response.headers.get('Content-Length')), 0)
 
+    def test_unknown_country(self):
+        """
+        A call with an unknown country yields an HTTP 204 response
+        """
+        response = self.client.post(url_for('v2_links.fetch'),
+                                    content_type='application/json',
+                                    headers=[("User-Agent", "TestClient")],
+                                    environ_base={"REMOTE_ADDR": "202.224.135.69"},
+                                    data=json.dumps({'locale': 'en-US'}))
+        assert_equals(response.status_code, 204)
+        assert_equals(int(response.headers.get('Content-Length')), 0)
+
     def test_empty_payload(self):
         """
         A call with an empty empty json errors out b/c no locale is present
@@ -43,12 +55,10 @@ class TestNewtabServing(BaseTestCase):
         assert_equals(int(response.headers.get('Content-Length')), 0)
 
     def test_success(self):
-        """
-        A call with an unknown locale yields an HTTP 204 response
-        """
         response = self.client.post(url_for('v2_links.fetch'),
                                     content_type='application/json',
                                     headers=[("User-Agent", "TestClient")],
+                                    environ_base={"REMOTE_ADDR": "173.194.43.105"},
                                     data=json.dumps({'locale': 'en-US'}))
         assert_equals(response.status_code, 303)
 
@@ -81,7 +91,7 @@ class TestClickPing(BaseTestCase):
         response = self.client.post(url_for('v2_links.click'),
                                     content_type='application/json',
                                     headers=[("User-Agent", "TestClient")],
-                                    data=json.dumps({"data":"test"}))
+                                    data=json.dumps({"data": "test"}))
         assert_equals(response.status_code, 200)
         assert_equals(int(response.headers.get('Content-Length')), 0)
 

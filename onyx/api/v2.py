@@ -27,14 +27,13 @@ def fetch():
 
     try:
         ip_addr = request.headers.get('X-Forwarded-For')
-        if ip_addr == None:
+        if ip_addr is None:
             ip_addr = request.remote_addr
 
         ua = request.headers.get('User-Agent')
         raw_client_payload = request.get_data(cache=False)
         client_payload = ujson.decode(raw_client_payload)
 
-        country = env.geoip_db.country(ip_addr).country.iso_code
         locale = client_payload['locale']
 
     except Exception:
@@ -47,6 +46,11 @@ def fetch():
         env.statsd.incr("fetch_error")
         return Response('', content_type='application/json; charset=utf-8',
                         status=400)
+
+    try:
+        country = env.geoip_db.country(ip_addr).country.iso_code
+    except:
+        country = "ERROR"
 
     localized = current_app.config['LINKS_LOCALIZATIONS'].get("%s/%s" % (country, locale))
 

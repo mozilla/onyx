@@ -58,5 +58,6 @@ class TestNewtabServing(BaseTestCase):
         response = self.client.post(url_for('v2_links.fetch'),
                                     content_type='application/json',
                                     headers=[("User-Agent", "TestClient")],
+                                    environ_base={"REMOTE_ADDR": "173.194.43.105"},
                                     data=json.dumps({'locale': 'en-US', 'directoryCount': {'organic': 1}}))
         assert_equals(response.status_code, 303)
