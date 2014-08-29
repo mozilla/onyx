@@ -142,10 +142,10 @@ class Environment(object):
 def _read_tile_index_loop(env):
     """wait for 15 minutes (greenlet), then open tile index file and replace LINKS_LOCALIZATIONS"""
     try:
-        gevent.sleep(15 * 60)
         with open(os.path.join(env.config.TILE_INDEX_DIR, env.config.TILE_INDEX_FILE), "r") as fp:
             data = fp.readall()
             env.config.LINKS_LOCALIZATIONS = ujson.decode(data)
+        gevent.sleep(15 * 60)
     except Exception as e:
         pass
         # TODO: do we have a log for error messages somewhere?
