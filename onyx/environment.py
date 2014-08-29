@@ -7,6 +7,7 @@ import ujson
 from flask import Flask
 from mock import Mock
 from statsd import StatsClient
+import geoip2.database
 
 
 class EnvironmentUninitializedError(Exception): pass
@@ -18,6 +19,7 @@ class Environment(object):
         self.__config_filename = config_filename
         self.config = self.load_config_obj(config_filename)
         self.__application = None
+        self.__geoip_db = None
         self.statsd = None
         self.init()
         if not hasattr(Environment, "_instance"):
@@ -112,6 +114,13 @@ class Environment(object):
             app.config['STATIC_FOLDER'] = None
         self.__application = app
         return app
+
+    @property
+    def geoip_db(self):
+        if not self.__geoip_db:
+            print self.config.GEO_DB_FILE
+            self.__geoip_db = geoip2.database.Reader(self.config.GEO_DB_FILE)
+        return self.__geoip_db
 
     @classmethod
     def instance(cls, config=None):

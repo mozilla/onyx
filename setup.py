@@ -9,7 +9,8 @@ requires = [
     "pycrypto==2.6.1",
     "mock==1.0.1",
     "statsd==3.0",
-    'ujson',
+    "geoip2==0.6.0",
+    "ujson==1.33",
 ]
 
 if 'MOZ_ONYX_DEV' in os.environ:
@@ -23,12 +24,12 @@ if 'MOZ_ONYX_DEV' in os.environ:
 
 setup(
     name="onyx",
-    version="1.1",
+    version="1.3.0",
     description="Link server and engagement metrics " +
                 "aggregator for Firefox Directory Links",
     author="Mozilla",
     packages=find_packages(),
-    package_data={"": ["*.lua"]},
+    package_data={"": ["*.mmdb"]},
     include_package_data=True,
     install_requires=requires,
     scripts=["scripts/manage.py"],

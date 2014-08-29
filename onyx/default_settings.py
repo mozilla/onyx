@@ -1,3 +1,4 @@
+import os
 import sys
 import logging
 import logging.handlers
@@ -18,6 +19,8 @@ class DefaultConfig(object):
         'en-US': '/static/directoryLinks.json',
     }
 
+    GEO_DB_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/GeoLite2-Country.mmdb")
+
     STATSD = {
             'host': 'localhost',
             'port': 8125,
@@ -28,7 +31,7 @@ class DefaultConfig(object):
                 'handler': logging.handlers.SysLogHandler,
                 'level': logging.INFO,
                 'params': {
-                    'address': "/var/run/syslog",
+                    'address': ('localhost', 514),
                     'facility': logging.handlers.SysLogHandler.LOG_LOCAL0,
                     'socktype': socket.SOCK_DGRAM,
                 }
@@ -37,7 +40,7 @@ class DefaultConfig(object):
                 'handler': logging.handlers.SysLogHandler,
                 'level': logging.INFO,
                 'params': {
-                    'address': "/var/run/syslog",
+                    'address': ('localhost', 514),
                     'facility': logging.handlers.SysLogHandler.LOG_LOCAL1,
                     'socktype': socket.SOCK_DGRAM,
                 }
@@ -47,7 +50,7 @@ class DefaultConfig(object):
                 'format': '%(message)s',
                 'level': logging.INFO,
                 'params': {
-                    'address': "/var/run/syslog",
+                    'address': ('localhost', 514),
                     'facility': logging.handlers.SysLogHandler.LOG_LOCAL2,
                     'socktype': socket.SOCK_DGRAM,
                 }
