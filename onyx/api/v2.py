@@ -34,6 +34,7 @@ def fetch():
         raw_client_payload = request.get_data(cache=False)
         client_payload = ujson.decode(raw_client_payload)
 
+        country = env.geoip_db.country(ip_addr).country.iso_code
         locale = client_payload['locale']
 
     except Exception:
@@ -47,7 +48,7 @@ def fetch():
         return Response('', content_type='application/json; charset=utf-8',
                         status=400)
 
-    localized = current_app.config['LINKS_LOCALIZATIONS'].get(locale)
+    localized = current_app.config['LINKS_LOCALIZATIONS'].get("%s/%s" % (country, locale))
 
     if localized:
         # 303 hints to the client to always use GET for the redirect
@@ -105,7 +106,6 @@ def handle_ping(ping_type):
         env.statsd.incr("{0}".format(ping_type, "_error"))
         return Response('', content_type='application/json; charset=utf-8',
                         status=400)
-
 
     env.log_dict(name="user_event", message=client_payload)
 
