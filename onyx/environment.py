@@ -8,9 +8,11 @@ from flask import Flask
 from mock import Mock
 from statsd import StatsClient
 import geoip2.database
+import gevent
+import os
 
-
-class EnvironmentUninitializedError(Exception): pass
+class EnvironmentUninitializedError(Exception):
+    pass
 
 
 class Environment(object):
@@ -113,6 +115,11 @@ class Environment(object):
         if app.config['ENVIRONMENT'] not in app.config['STATIC_ENABLED_ENVS']:
             app.config['STATIC_FOLDER'] = None
         self.__application = app
+
+        # spawn off the tile index reader
+        if not self.is_test:
+            gevent.spawn(_read_tile_index_loop, self)
+
         return app
 
     @property
@@ -130,3 +137,18 @@ class Environment(object):
             return Environment(config)
 
         raise EnvironmentUninitializedError("Cannot obtain instance if uninitialized")
+
+
+def _read_tile_index_loop(env):
+    """wait for 15 minutes (greenlet), then open tile index file and replace LINKS_LOCALIZATIONS"""
+    try:
+        gevent.sleep(15 * 60)
+        with open(os.path.join(env.config.TILE_INDEX_DIR, env.config.TILE_INDEX_FILE), "r") as fp:
+            data = fp.readall()
+            env.config.LINKS_LOCALIZATIONS = ujson.decode(data)
+    except Exception as e:
+        pass
+        # TODO: do we have a log for error messages somewhere?
+
+
+

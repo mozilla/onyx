@@ -67,7 +67,12 @@ def fetch():
         return Response('', content_type='application/json; charset=utf-8',
                         status=400)
 
-    localized = current_app.config['LINKS_LOCALIZATIONS'].get(locale)
+    try:
+        country = env.geoip_db.country(ip_addr).country.iso_code
+    except:
+        country = "ERROR"
+
+    localized = current_app.config['LINKS_LOCALIZATIONS'].get("%s/%s" % (country, locale))
 
     if localized:
         # 303 hints to the client to always use GET for the redirect
