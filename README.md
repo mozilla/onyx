@@ -37,17 +37,17 @@ Method: POST
 Example Payload:
 
     {
-    	"tiles": [
-    	  {
-    		"id": 8,
-    		"pin": true, # if the tile is pinned, absent otherwise
-    		"pos": 2,
-    		"enhanced": 1 # present if the tile is an enhanced tile
-    	  },
-    	  {
-    	    "id": 12
-    	  }
-    	]
+      "tiles": [
+        {
+    	  "id": 8,
+          "pin": true, # if the tile is pinned, absent otherwise
+          "pos": 2,
+    	  "enhanced": 1 # present if the tile is an enhanced tile
+    	},
+    	{
+    	  "id": 12
+    	}
+      ]
     }
 
 Parameters:
@@ -71,7 +71,7 @@ Method: POST
 Example Payload:
 
     {
-    	"click": 1,
+      "click": 1,
       "tiles": [
         {
           "id": 8,
@@ -80,7 +80,7 @@ Example Payload:
           "enhanced": 1
         },
         {
-        	"id": 12
+          "id": 12
         },
         ...
       ]
