@@ -43,7 +43,7 @@ Example Payload:
           "pin": true, # if the tile is pinned, absent otherwise
           "pos": 2,
           "score": 2000,
-    	  "enhanced": 1 # present if the tile is an enhanced tile
+    	  "url": "" # present if the tile is an enhanced tile
     	},
     	{
     	  "id": 12
@@ -57,12 +57,12 @@ Parameters:
 	* `pin`: signals that the tile is pinned in the UA, otherwise absent
 	* `pos`: if any tiles were skipped in this payload, this denotes the index of the tile in the new tab page
 	* `score`: frecency for the tile
-	* `enhanced`: signals that the tile is enhanced. absent otherwise
+	* `url`: signals that the tile is enhanced. absent otherwise. value is empty, i.e. no urls are sent
 
 
 ## /v2/links/click
 
-The `click` endpoint captures any click interaction with the tile. This includes `click`, `block`, `pin` and `unpin`.
+The `click` endpoint captures any click interaction with the tile. This includes `click`, `block`, `pin`, `unpin`, `sponsored`, and `sponsored_link`.
 
 When the user interacts with the tile, an asynchronous ping is sent to Mozilla servers. This is to measure a click event. Since our business model is Cost per Click (CPC), this metric is vital.
 
@@ -91,6 +91,6 @@ Example Payload:
 
 Parameters:
 
-* `click`/`block`/`pin`/`unpin`: Only one of these can happen in one payload. The value of this `action` is the index in `tiles` for which this action applies
+* `click`/`block`/`pin`/`unpin`/`sponsored`/`sponsored_link`: Only one of these can happen in one payload. The value of this `action` is the index in `tiles` for which this action applies
 * The rest of the parameters are the same as for `/v2/links/view`
 
