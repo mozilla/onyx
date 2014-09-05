@@ -40,10 +40,10 @@ Example Payload:
       "tiles": [
         {
     	  "id": 8,
-          "pin": true, # if the tile is pinned, absent otherwise
+          "pin": true,
           "pos": 2,
           "score": 2000,
-    	  "url": "" # present if the tile is an enhanced tile
+    	  "url": ""
     	},
     	{
     	  "id": 12
@@ -80,7 +80,7 @@ Example Payload:
           "pin": true,
           "pos": 2,
           "score": 2000,
-          "enhanced": 1
+          "url": ""
         },
         {
           "id": 12
