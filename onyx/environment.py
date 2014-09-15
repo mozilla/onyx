@@ -9,7 +9,9 @@ from mock import Mock
 from statsd import StatsClient
 import geoip2.database
 import gevent
-import os, sys
+import os
+import sys
+
 
 class EnvironmentUninitializedError(Exception):
     pass

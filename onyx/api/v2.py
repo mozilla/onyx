@@ -49,11 +49,13 @@ def fetch():
     try:
         country = env.geoip_db.country(ip_addr).country.iso_code
     except:
-        country = "ERROR"
+        country = "STAR"
 
     localized = env.config.LINKS_LOCALIZATIONS.get("%s/%s" % (country, locale))
+    if localized is None:
+        localized = env.config.LINKS_LOCALIZATIONS.get("STAR/%s" % locale)
 
-    if localized:
+    if localized is not None:
         # 303 hints to the client to always use GET for the redirect
         # ETag is handled by the directory link hosting server
         response = make_response(redirect(localized, code=303))
