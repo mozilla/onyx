@@ -20,14 +20,18 @@ def fetch():
     """
     Given a locale, return locale-specific links if possible.
     """
+    ip_addrs = None
     ip_addr = None
     ua = None
     locale = None
 
     try:
-        ip_addr = request.headers.get('X-Forwarded-For')
-        if ip_addr is None:
-            ip_addr = request.remote_addr
+        ip_addrs = request.headers.get('X-Forwarded-For')
+        if ip_addrs is None:
+            ip_addrs = request.remote_addr
+
+        if ip_addrs is not None:
+            ip_addr = ip_addrs.split(',')[0]
 
         ua = request.headers.get('User-Agent')
         raw_client_payload = request.get_data(cache=False)
@@ -37,7 +41,7 @@ def fetch():
 
     except Exception:
         env.log_dict(name="client_error", action="fetch_malformed_payload", level=logging.WARN, message={
-            "ip": ip_addr,
+            "ip": ip_addrs,
             "ua": ua,
             "locale": locale,
             "ver": "2",
@@ -60,7 +64,7 @@ def fetch():
         # ETag is handled by the directory link hosting server
         response = make_response(redirect(localized, code=303))
         env.log_dict(name="application", action="fetch_served", message={
-            "ip": ip_addr,
+            "ip": ip_addrs,
             "ua": ua,
             "locale": locale,
             "ver": "2",
@@ -69,7 +73,7 @@ def fetch():
     else:
         response = make_response(('', 204))
         env.log_dict(name="application", action="fetch_locale_unavailable", message={
-            "ip": ip_addr,
+            "ip": ip_addrs,
             "ua": ua,
             "locale": locale,
             "ver": "2",
@@ -93,7 +97,7 @@ def handle_ping(ping_type):
         client_payload = ujson.decode(client_payload_raw)
         
         ip_addr = request.headers.get('X-Forwarded-For')
-        if ip_addr == None:
+        if ip_addr is None:
             ip_addr = request.remote_addr
             
         ua = request.headers.get('User-Agent')
