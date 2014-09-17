@@ -1,4 +1,3 @@
-import json
 import logging
 from flask import (
     current_app,

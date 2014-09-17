@@ -53,11 +53,11 @@ Example Payload:
 
 Parameters:
 * `tiles`: an ordered array of tiles representative of what is in a new tab page
-	* `id`: a tile ID. provided in the fetch payload as `directoryId`
-	* `pin`: signals that the tile is pinned in the UA, otherwise absent
-	* `pos`: if any tiles were skipped in this payload, this denotes the index of the tile in the new tab page
-	* `score`: frecency for the tile
-	* `url`: signals that the tile is enhanced. absent otherwise. value is empty, i.e. no urls are sent
+	* `id`: a tile ID. provided in the fetch payload as `directoryId`; absent for history tiles
+	* `pin`: signals that the tile is pinned in the UA; absent for unpinned tiles
+	* `pos`: denotes the index of the tile in the new tab page; absent if the value is the same as its array index of `tiles`
+	* `score`: frecency for the tile; absent for frecencies under 5000
+	* `url`: signals that the tile is enhanced (with an empty "" value); absent for directory and history tiles
 
 
 ## /v2/links/click

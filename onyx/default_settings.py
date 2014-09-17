@@ -22,11 +22,7 @@ class DefaultConfig(object):
     ENVIRONMENT = 'dev'
     LINKS_LOCALIZATIONS = {
         'US/en-US': '/static/directoryLinks.json',
-        'GB/en-US': '/static/directoryLinks.json',
-        'AU/en-US': '/static/directoryLinks.json',
-        'IE/en-US': '/static/directoryLinks.json',
-        'NZ/en-US': '/static/directoryLinks.json',
-        'CA/en-US': '/static/directoryLinks.json',
+        'STAR/en-US': '/static/directoryLinks.json',
     }
 
     GEO_DB_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/GeoLite2-Country.mmdb")
