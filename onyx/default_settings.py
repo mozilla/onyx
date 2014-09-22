@@ -15,15 +15,11 @@ class DefaultConfig(object):
 
     STATIC_ENABLED_ENVS = {'dev', 'test'}
 
-    TILE_INDEX_BUCKET = "onyx_data_bucket"
     TILE_INDEX_FILE = "tile_index.json"
     TILE_INDEX_DIR = "/var/data/onyx/"
 
     ENVIRONMENT = 'dev'
-    LINKS_LOCALIZATIONS = {
-        'US/en-US': '/static/directoryLinks.json',
-        'STAR/en-US': '/static/directoryLinks.json',
-    }
+    LINKS_LOCALIZATIONS = {}
 
     GEO_DB_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/GeoLite2-Country.mmdb")
 
