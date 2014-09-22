@@ -127,7 +127,6 @@ class Environment(object):
     @property
     def geoip_db(self):
         if not self.__geoip_db:
-            print self.config.GEO_DB_FILE
             self.__geoip_db = geoip2.database.Reader(self.config.GEO_DB_FILE)
         return self.__geoip_db
 
@@ -148,7 +147,6 @@ def _read_tile_index_loop(env):
             with open(os.path.join(env.config.TILE_INDEX_DIR, env.config.TILE_INDEX_FILE), "r") as fp:
                 data = fp.readall()
                 env.config.LINKS_LOCALIZATIONS = ujson.decode(data)
-            # print "shit, y'all"
             gevent.sleep(15 * 60)
         except Exception as e:
             print >> sys.stderr, "Error in gevent tiles loop: %s" % e
