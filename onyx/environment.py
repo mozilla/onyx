@@ -3,6 +3,7 @@ import importlib
 import logging
 import logging.handlers
 import ujson
+import traceback
 
 from flask import Flask
 from mock import Mock
@@ -148,9 +149,9 @@ def _read_tile_index_loop(env):
                 data = fp.readall()
                 env.config.LINKS_LOCALIZATIONS = ujson.decode(data)
             gevent.sleep(15 * 60)
-        except Exception as e:
-            print >> sys.stderr, "Error in gevent tiles loop: %s" % e
+        except Exception, e:
+            env.log_dict(name="application", action="gevent_tiles_update_error", message={
+                "err": e.message,
+                "traceback": traceback.format_exc(),
+            })
             gevent.sleep(5)
-
-
-
