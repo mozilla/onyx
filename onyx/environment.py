@@ -146,7 +146,7 @@ def _read_tile_index_loop(env):
     while True:
         try:
             with open(os.path.join(env.config.TILE_INDEX_DIR, env.config.TILE_INDEX_FILE), "r") as fp:
-                data = fp.readall()
+                data = fp.read()
                 env.config.LINKS_LOCALIZATIONS = ujson.decode(data)
             gevent.sleep(15 * 60)
         except Exception, e:
