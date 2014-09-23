@@ -72,6 +72,8 @@ def fetch():
         country = "ERROR"
 
     localized = current_app.config['LINKS_LOCALIZATIONS'].get("%s/%s" % (country, locale))
+    if localized is None:
+        localized = env.config.LINKS_LOCALIZATIONS.get("STAR/%s" % locale)
 
     if localized:
         # 303 hints to the client to always use GET for the redirect
