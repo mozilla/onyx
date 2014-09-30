@@ -14,8 +14,8 @@ from onyx.environment import Environment
 links = Blueprint('v1_links', __name__, url_prefix='/v1/links')
 env = Environment.instance()
 
-@env.statsd.timer('v1_links_fetch')
 @links.route('/fetch', methods=['POST'])
+@env.statsd.timer('v1_links_fetch')
 def fetch():
     """
     Given a locale, return locale-specific links if possible.

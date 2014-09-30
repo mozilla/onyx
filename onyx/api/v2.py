@@ -14,8 +14,8 @@ links = Blueprint('v2_links', __name__, url_prefix='/v2/links')
 env = Environment.instance()
 
 
-@env.statsd.timer('v2_links_fetch')
 @links.route('/fetch', methods=['POST'])
+@env.statsd.timer('v2_links_fetch')
 def fetch():
     """
     Given a locale, return locale-specific links if possible.
@@ -95,11 +95,11 @@ def handle_ping(ping_type):
     try:
         client_payload_raw = request.get_data(cache=False)
         client_payload = ujson.decode(client_payload_raw)
-        
+
         ip_addr = request.headers.get('X-Forwarded-For')
         if ip_addr is None:
             ip_addr = request.remote_addr
-            
+
         ua = request.headers.get('User-Agent')
         client_payload["ua"] = ua
         client_payload["ip"] = ip_addr
@@ -123,8 +123,8 @@ def handle_ping(ping_type):
                     status=200)
 
 
-@env.statsd.timer('v2_links_view')
 @links.route('/view', methods=['POST'])
+@env.statsd.timer('v2_links_view')
 def view():
     """
     Log impression ping sent from Firefox on each newtab open event
@@ -132,8 +132,8 @@ def view():
     return handle_ping("view")
 
 
-@env.statsd.timer('v2_links_click')
 @links.route('/click', methods=['POST'])
+@env.statsd.timer('v2_links_click')
 def click():
     """
     Log tile ping sent from Firefox on each tile action
