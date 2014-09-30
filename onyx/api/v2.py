@@ -118,6 +118,7 @@ def handle_ping(ping_type):
 
     env.log_dict(name="user_event", message=client_payload)
 
+    env.statsd.incr("{0}".format(ping_type))
     return Response('', content_type='application/json; charset=utf-8',
                     status=200)
 
