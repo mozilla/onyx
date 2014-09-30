@@ -112,7 +112,7 @@ def handle_ping(ping_type):
             "ver": "2",
         })
 
-        env.statsd.incr("{0}".format(ping_type, "_error"))
+        env.statsd.incr("{0}_error".format(ping_type))
         return Response('', content_type='application/json; charset=utf-8',
                         status=400)
 
