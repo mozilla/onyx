@@ -15,15 +15,15 @@ env = Environment.instance()
 
 
 @links.route('/fetch', methods=['POST'])
+@links.route('/fetch/<locale>', methods=['GET'])
 @env.statsd.timer('v2_links_fetch')
-def fetch():
+def fetch(locale=None):
     """
     Given a locale, return locale-specific links if possible.
     """
     ip_addrs = None
     ip_addr = None
     ua = None
-    locale = None
 
     try:
         ip_addrs = request.headers.get('X-Forwarded-For')
@@ -34,10 +34,12 @@ def fetch():
             ip_addr = ip_addrs.split(',')[0]
 
         ua = request.headers.get('User-Agent')
-        raw_client_payload = request.get_data(cache=False)
-        client_payload = ujson.decode(raw_client_payload)
 
-        locale = client_payload['locale']
+        if not locale:
+            raw_client_payload = request.get_data(cache=False)
+            client_payload = ujson.decode(raw_client_payload)
+
+            locale = client_payload['locale']
 
     except Exception:
         env.log_dict(name="client_error", action="fetch_malformed_payload", level=logging.WARN, message={
