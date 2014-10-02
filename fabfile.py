@@ -5,7 +5,7 @@ from distutils.util import strtobool
 from functools import wraps
 
 from fabric import colors
-from fabric.api import env, run, local, require, put, abort, sudo, settings, parallel, serial
+from fabric.api import env, run, local, require, put, sudo, settings, parallel, serial
 
 env.path = "/var/www/onyx"
 env.user = "root"
@@ -118,6 +118,7 @@ def restart_processes():
             # if reload didn't work, attempt to start supervisor
             # e.g. for first run after install
             sudo("/etc/init.d/supervisor start")
+
 
 def to_bool(value):
     if not isinstance(value, bool):

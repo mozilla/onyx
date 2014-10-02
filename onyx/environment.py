@@ -11,7 +11,6 @@ from statsd import StatsClient
 import geoip2.database
 import gevent
 import os
-import sys
 
 
 class EnvironmentUninitializedError(Exception):

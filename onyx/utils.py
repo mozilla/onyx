@@ -1,19 +1,17 @@
 import sys
 import multiprocessing
-import logging
 import os
 from os.path import abspath, dirname
-from functools import wraps
 from datetime import datetime
 
 from flask.ext.script import Command, Option
 from gunicorn.app.base import Application as GunicornApplication
 from gunicorn.config import Config as GunicornConfig
-import statsd
 from onyx.environment import Environment
 
 
 CONFIG_PATH_LOCATIONS = ['/etc/onyx', abspath(dirname(__file__))]
+
 
 def environment_manager_create(config=None):
     """
@@ -38,18 +36,22 @@ def environment_manager_create(config=None):
 
     return env.application
 
+
 def unix_time(dt):
     epoch = datetime.utcfromtimestamp(0)
     delta = dt - epoch
     return delta.total_seconds()
 
+
 def unix_time_millis(dt):
     return unix_time(dt) * 1000.0
+
 
 def utcnow_millis(dt=None):
     if not dt:
         dt = datetime.utcnow()
     return unix_time_millis(datetime.utcnow())
+
 
 class GunicornServerCommand(Command):
     """

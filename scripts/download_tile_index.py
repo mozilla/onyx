@@ -19,11 +19,11 @@ def main():
 
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('url', metavar='TILE_INDEX_URL', type=str,
-                       help='the location of the tile index to download')
+                        help='the location of the tile index to download')
     parser.add_argument('dest', metavar='DEST', type=str,
-                       help='the filepath to save the file at')
+                        help='the filepath to save the file at')
     parser.add_argument('--temp-dir', dest='temp_dir', default='/tmp', type=str,
-                       help='specify temp storage before moving to destination')
+                        help='specify temp storage before moving to destination')
     args = parser.parse_args()
 
     logging.info('downloading url:{0}'.format(args.url))

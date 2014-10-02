@@ -1,17 +1,9 @@
 import json
-from copy import deepcopy
-from datetime import datetime, timedelta
-import calendar
-from onyx.encryption import encrypt, decrypt
 from flask import url_for
-from flask.sessions import SecureCookieSessionInterface
 from nose.tools import (
     assert_equals,
-    assert_is_not_none,
-    assert_is_none,
-    assert_not_equals
+    assert_is_none
 )
-from werkzeug.http import parse_cookie
 from tests.base import BaseTestCase
 
 
