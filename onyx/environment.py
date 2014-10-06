@@ -105,10 +105,9 @@ class Environment(object):
         ### logging
         if self.is_test:
             self.log_dict = Mock()
-            self.statsd = Mock()
         else:
             self.__loggers = self.__setup_loggers()
-            self.statsd = StatsClient(**self.config.STATSD)
+        self.statsd = StatsClient(**self.config.STATSD)
 
         # Application server setup
         app = Flask('onyx')
