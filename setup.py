@@ -21,6 +21,7 @@ if 'MOZ_ONYX_DEV' in os.environ:
         "Flask-Testing==0.4.1",
         "Fabric==1.8.1",
         "coverage==3.7.1",
+        "coveralls==0.4.4",
     ])
 
 setup(
