@@ -54,6 +54,9 @@ class TestNewtabServing(BaseTestCase):
         assert_equals(int(response.headers.get('Content-Length')), 0)
 
     def test_success(self):
+        """
+        A call with an known geo/locale pair redirects
+        """
         response = self.client.post(url_for('v2_links.fetch'),
                                     content_type='application/json',
                                     headers=[("User-Agent", "TestClient")],

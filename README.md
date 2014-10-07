@@ -1,5 +1,8 @@
 # onyx
 
+[![Build Status](https://travis-ci.org/oyiptong/onyx.svg?branch=master)](https://travis-ci.org/oyiptong/onyx)
+[![Coverage Status](https://coveralls.io/repos/oyiptong/onyx/badge.png?branch=master)](https://coveralls.io/r/oyiptong/onyx?branch=master)
+
 Link server and engagement metrics aggregator for Firefox Directory Links
 
 There are 3 API endpoints we care about:

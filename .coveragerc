@@ -1,0 +1,11 @@
+[run]
+branch = True
+source = onyx
+include = onyx/*
+omit = onyx/tests/*
+
+[report]
+show_missing = True
+
+[html]
+title = Mozill Onyx coverage report

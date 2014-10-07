@@ -45,7 +45,7 @@ class TestNewtabServing(BaseTestCase):
 
     def test_success(self):
         """
-        A call with an unknown locale yields an HTTP 204 response
+        A call with an known geo/locale pair redirects
         """
         response = self.client.post(url_for('v1_links.fetch'),
                                     content_type='application/json',
