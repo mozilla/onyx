@@ -40,6 +40,8 @@ Method: POST
 Example Payload:
 
     {
+      "view": 1,
+      "locale": "en-US",
       "tiles": [
         {
     	  "id": 8,
@@ -55,12 +57,14 @@ Example Payload:
     }
 
 Parameters:
+* `view`: the value of this `action` is the index of the last tile in `tiles` visible in the user's viewport
 * `tiles`: an ordered array of tiles representative of what is in a new tab page
 	* `id`: a tile ID. provided in the fetch payload as `directoryId`; absent for history tiles
 	* `pin`: signals that the tile is pinned in the UA; absent for unpinned tiles
 	* `pos`: denotes the index of the tile in the new tab page; absent if the value is the same as its array index of `tiles`
 	* `score`: frecency for the tile; absent for frecencies under 5000
 	* `url`: signals that the tile is enhanced (with an empty "" value); absent for directory and history tiles
+* `locale`: User Agent locale setting
 
 
 ## /v2/links/click
@@ -77,6 +81,7 @@ Example Payload:
 
     {
       "click": 1,
+      "locale": "en-US",
       "tiles": [
         {
           "id": 8,
@@ -95,5 +100,4 @@ Example Payload:
 Parameters:
 
 * `click`/`block`/`pin`/`unpin`/`sponsored`/`sponsored_link`: Only one of these can happen in one payload. The value of this `action` is the index in `tiles` for which this action applies
-* The rest of the parameters are the same as for `/v2/links/view`
-
+* The rest of the parameters are the same as for `/v2/links/view` except for the `view` action, i.e. the `locale` and `tiles` params.
