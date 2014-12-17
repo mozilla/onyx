@@ -1,10 +1,13 @@
 import sys
 import multiprocessing
 import os
+import random
+import uuid
 from os.path import abspath, dirname
 from datetime import datetime
 
-from flask.ext.script import Command, Option
+from flask import json
+from flask.ext.script import Command, Option, Manager
 from gunicorn.app.base import Application as GunicornApplication
 from gunicorn.config import Config as GunicornConfig
 from onyx.environment import Environment
@@ -140,3 +143,65 @@ class GunicornServerCommand(Command):
                         self.cfg.set(k.lower(), v)
 
         GunicornServer().run()
+
+
+LogCommand = Manager(usage="send logs")
+
+
+@LogCommand.option('-s', '--msg_size', type=int, dest='min_kb', default=1, help='Minimum message size in KB (default: 1)', required=False)
+@LogCommand.option('num_msgs', type=int, help='Number of messages to send')
+def flood_user_event(num_msgs, min_kb, *args, **kwargs):
+    """
+    Flood the user event log with simulated data
+    """
+    ua_str = 'Onyx-LogFlood/1.0'
+    ip = '0.0.0.0'
+    locale = 'en-US'
+    ver = '2'
+
+    min_bytes = min_kb * 1024
+    url_suffix = '.mozilla.org'
+    num_messages_for_size = None
+
+    events = []
+
+    def gen_tiles(num_urls=12):
+        for i in xrange(num_urls):
+            url_prefix = str(uuid.uuid4())
+            url = '{0}{1}'.format(url_prefix, url_suffix)
+            id = random.randint(1, 500)
+            yield {'url': url, 'id': id}
+
+    for i in xrange(num_msgs):
+
+        tiles = []
+        message = {
+            'ip': ip,
+            'ua': ua_str,
+            'locale': locale,
+            'ver': ver,
+            'tiles': tiles,
+            'view': len(tiles)
+        }
+
+        bytes_message = len(json.dumps(message))
+
+        if num_messages_for_size is None:
+            # find and cache the number of messages to reach min_bytes
+            num_messages = 0
+            while bytes_message < min_bytes:
+                for i in gen_tiles(10):
+                    tiles.append(i)
+                message['view'] = len(tiles)
+                bytes_message = len(json.dumps(message))
+                num_messages += 10
+            num_messages_for_size = num_messages
+        else:
+            tiles.extend(gen_tiles(num_messages_for_size))
+            message['view'] = len(tiles)
+
+        events.append(message)
+
+    env = Environment.instance()
+    for event in events:
+        env.log_dict(name='user_event', message=event)
