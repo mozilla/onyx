@@ -166,13 +166,11 @@ def flood_user_event(num_msgs, min_kb, *args, **kwargs):
     events = []
 
     def gen_tiles(num_urls=12):
-        tiles = []
         for i in xrange(num_urls):
             url_prefix = str(uuid.uuid4())
             url = '{0}{1}'.format(url_prefix, url_suffix)
             id = random.randint(1, 500)
-            tiles.append({'url': url, 'id': id})
-        return tiles
+            yield {'url': url, 'id': id}
 
     for i in xrange(num_msgs):
 
@@ -192,7 +190,8 @@ def flood_user_event(num_msgs, min_kb, *args, **kwargs):
             # find and cache the number of messages to reach min_bytes
             num_messages = 0
             while bytes_message < min_bytes:
-                tiles.extend(gen_tiles(10))
+                for i in gen_tiles(10):
+                    tiles.append(i)
                 message['view'] = len(tiles)
                 bytes_message = len(json.dumps(message))
                 num_messages += 10
@@ -203,7 +202,6 @@ def flood_user_event(num_msgs, min_kb, *args, **kwargs):
 
         events.append(message)
 
-    from onyx.environment import Environment
     env = Environment.instance()
     for event in events:
         env.log_dict(name='user_event', message=event)
