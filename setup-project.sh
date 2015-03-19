@@ -20,3 +20,9 @@ virtualenv --python=python2.7 --no-site-packages onyx-env
 
 
 python setup.py develop
+pip install -r requirements.txt
+
+if [ "$MOZ_ONYX_DEV" ]
+then
+    pip install -r requirements-dev.txt
+fi
