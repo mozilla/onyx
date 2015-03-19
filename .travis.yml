@@ -1,3 +1,4 @@
+sudo: false
 language: python
 env: MOZ_ONYX_DEV=1
 python:
