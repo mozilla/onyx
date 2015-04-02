@@ -7,3 +7,5 @@ dependencies:
 test:
     override:
         - fab build
+    post:
+        - coveralls
