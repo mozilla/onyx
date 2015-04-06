@@ -1,9 +1,6 @@
 import json
 from flask import url_for
-from nose.tools import (
-    assert_equals,
-    assert_is_none,
-)
+from nose.tools import assert_equals
 from tests.base import BaseTestCase
 
 
@@ -13,9 +10,10 @@ class TestNewtabServing(BaseTestCase):
         """
         A call with an unknown locale yields an HTTP 204 response
         """
-        response = self.client.get(url_for('v3_links.fetch', locale='zh-CN', channel='beta'),
-                                    content_type='application/json',
-                                    headers=[("User-Agent", "TestClient")])
+        response = self.client.get(
+            url_for('v3_links.fetch', locale='zh-CN', channel='beta'),
+            content_type='application/json',
+            headers=[("User-Agent", "TestClient")])
         assert_equals(response.status_code, 204)
         assert_equals(int(response.headers.get('Content-Length')), 0)
 
@@ -23,20 +21,22 @@ class TestNewtabServing(BaseTestCase):
         """
         A call with an unknown country, but valid locale is success because of STAR
         """
-        response = self.client.get(url_for('v3_links.fetch', locale='en-US', channel='beta'),
-                                    content_type='application/json',
-                                    headers=[("User-Agent", "TestClient")],
-                                    environ_base={"REMOTE_ADDR": "202.224.135.69"})
+        response = self.client.get(
+            url_for('v3_links.fetch', locale='en-US', channel='beta'),
+            content_type='application/json',
+            headers=[("User-Agent", "TestClient")],
+            environ_base={"REMOTE_ADDR": "202.224.135.69"})
         assert_equals(response.status_code, 303)
 
     def test_success(self):
         """
         A call with an known geo/locale pair redirects
         """
-        response = self.client.get(url_for('v3_links.fetch', locale='en-US', channel='beta'),
-                                    content_type='application/json',
-                                    headers=[("User-Agent", "TestClient")],
-                                    environ_base={"REMOTE_ADDR": "173.194.43.105"})
+        response = self.client.get(
+            url_for('v3_links.fetch', locale='en-US', channel='beta'),
+            content_type='application/json',
+            headers=[("User-Agent", "TestClient")],
+            environ_base={"REMOTE_ADDR": "173.194.43.105"})
         assert_equals(response.status_code, 303)
 
 
