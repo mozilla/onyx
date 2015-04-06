@@ -11,6 +11,9 @@ class BaseTestCase(TestCase):
         self.app = environment_manager_create()
         env = Environment.instance()
         env.config.LINKS_LOCALIZATIONS = {
-            "STAR/en-US": "http://valid.url.com"
+            'STAR/en-US': {
+                'legacy': 'http://valid.url.com',
+                'ag': 'http://valid.url.again.com',
+            }
         }
         return self.app
