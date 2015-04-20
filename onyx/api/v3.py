@@ -1,10 +1,8 @@
-import logging
 from flask import (
     Blueprint,
     request,
     make_response,
-    redirect,
-    Response
+    redirect
 )
 from onyx.environment import Environment
 from onyx.api.v2 import handle_ping
