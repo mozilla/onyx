@@ -2,7 +2,7 @@
 branch = True
 source = onyx
 include = onyx/*
-omit = onyx/tests/*
+omit = onyx/tests/*,onyx/wsgi.py
 
 [report]
 show_missing = True
