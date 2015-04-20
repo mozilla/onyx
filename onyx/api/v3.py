@@ -24,27 +24,14 @@ def fetch(locale=None, channel=None):
     ip_addr = None
     ua = None
 
-    try:
-        ip_addrs = request.headers.get('X-Forwarded-For')
-        if ip_addrs is None:
-            ip_addrs = request.remote_addr
+    ip_addrs = request.headers.get('X-Forwarded-For')
+    if ip_addrs is None:
+        ip_addrs = request.remote_addr
 
-        if ip_addrs is not None:
-            ip_addr = ip_addrs.split(',')[0]
+    if ip_addrs is not None:
+        ip_addr = ip_addrs.split(',')[0]
 
-        ua = request.headers.get('User-Agent')
-
-    except Exception:
-        env.log_dict(name="client_error", action="fetch_malformed_payload", level=logging.WARN, message={
-            "ip": ip_addrs,
-            "ua": ua,
-            "locale": locale,
-            "channel": channel,
-            "ver": "3",
-        })
-        env.statsd.incr("fetch_error")
-        return Response('', content_type='application/json; charset=utf-8',
-                        status=400)
+    ua = request.headers.get('User-Agent')
 
     try:
         country = env.geoip_db.country(ip_addr).country.iso_code
