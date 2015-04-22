@@ -139,28 +139,13 @@ class Environment(object):
         raise EnvironmentUninitializedError("Cannot obtain instance if uninitialized")
 
 
-def _convert_legacy_index(legacy_index):
-    """Given a tile index, convert to the current index format expected by API endpoints"""
-    index = {}
-    for k, v in legacy_index.iteritems():
-        index[k] = {'legacy': v}
-    return index
-
-
 def _read_tile_index_loop(env, failure_sleep_duration=5, success_sleep_duration=15 * 60):
     """wait for 15 minutes (greenlet), then open tile index file and replace LINKS_LOCALIZATIONS"""
     while True:
         try:
             with open(os.path.join(env.config.TILE_INDEX_DIR, env.config.TILE_INDEX_FILE), "r") as fp:
                 data = fp.read()
-                index = ujson.decode(data)
-                api_version = index.get('__ver__', 0)
-
-                if api_version == 3:
-                    env.config.LINKS_LOCALIZATIONS = index
-                else:
-                    env.config.LINKS_LOCALIZATIONS = _convert_legacy_index(index)
-
+                env.config.LINKS_LOCALIZATIONS = ujson.decode(data)
             gevent.sleep(success_sleep_duration)
         except Exception, e:
             env.log_dict(name="application", action="gevent_tiles_update_error", message={
