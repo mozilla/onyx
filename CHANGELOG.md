@@ -1,3 +1,11 @@
+1.4.0
+=====
+
+* v3 API implemented. New functionality: serving adgroups
+
+__note__:
+This change requires a new tile index file format. The one used prior to 1.4.0 will break onyx.
+
 1.3.7
 =====
 
