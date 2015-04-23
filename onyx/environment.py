@@ -139,17 +139,17 @@ class Environment(object):
         raise EnvironmentUninitializedError("Cannot obtain instance if uninitialized")
 
 
-def _read_tile_index_loop(env):
+def _read_tile_index_loop(env, failure_sleep_duration=5, success_sleep_duration=15 * 60):
     """wait for 15 minutes (greenlet), then open tile index file and replace LINKS_LOCALIZATIONS"""
     while True:
         try:
             with open(os.path.join(env.config.TILE_INDEX_DIR, env.config.TILE_INDEX_FILE), "r") as fp:
                 data = fp.read()
                 env.config.LINKS_LOCALIZATIONS = ujson.decode(data)
-            gevent.sleep(15 * 60)
+            gevent.sleep(success_sleep_duration)
         except Exception, e:
             env.log_dict(name="application", action="gevent_tiles_update_error", message={
                 "err": e.message,
                 "traceback": traceback.format_exc(),
             })
-            gevent.sleep(5)
+            gevent.sleep(failure_sleep_duration)

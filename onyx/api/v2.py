@@ -57,9 +57,9 @@ def fetch(locale=None):
     except:
         country = "STAR"
 
-    localized = env.config.LINKS_LOCALIZATIONS.get("%s/%s" % (country, locale))
+    localized = env.config.LINKS_LOCALIZATIONS.get("%s/%s" % (country, locale), {}).get('legacy')
     if localized is None:
-        localized = env.config.LINKS_LOCALIZATIONS.get("STAR/%s" % locale)
+        localized = env.config.LINKS_LOCALIZATIONS.get("STAR/%s" % locale, {}).get('legacy')
 
     if localized is not None:
         # 303 hints to the client to always use GET for the redirect
@@ -85,7 +85,7 @@ def fetch(locale=None):
     return response
 
 
-def handle_ping(ping_type):
+def handle_ping(ping_type, api_version="2"):
     """
     A ping handler that just logs the data it receives for further processing
     in the backend
@@ -111,7 +111,7 @@ def handle_ping(ping_type):
             "ip": ip_addr,
             "ua": ua,
             "locale": locale,
-            "ver": "2",
+            "ver": api_version,
         })
 
         env.statsd.incr("{0}_error".format(ping_type))
