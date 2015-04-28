@@ -1,3 +1,8 @@
+1.4.1
+=====
+
+* Heartbeat API endpoint
+
 1.4.0
 =====
 
