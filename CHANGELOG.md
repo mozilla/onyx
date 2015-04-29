@@ -2,6 +2,7 @@
 =====
 
 * Heartbeat API endpoint
+* external api test script for validating fetch api
 
 1.4.0
 =====
