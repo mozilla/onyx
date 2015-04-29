@@ -7,10 +7,13 @@ Link server and engagement metrics aggregator for Firefox Directory Links
 
 There are a few API endpoints we care about:
 
-* /v2/links/fetch/`locale`
-* /v2/links/fetch
-* /v2/links/click
-* /v2/links/view
+* [/v2/links/fetch/`locale`](#v2linksfetchlocale)
+* [/v2/links/fetch](#v2linksfetch)
+* [/v2/links/view](#v2linksview)
+* [/v2/links/click](#v2linksclick)
+* [/v3/links/fetch/`locale`/`channel`](#v3linksfetchlocalechannel)
+* [/v3/links/view](#v3linksview)
+* [/v3/links/click](#v3linksclick)
 
 ## /v2/links/fetch/`locale`
 
@@ -19,6 +22,10 @@ The `fetch` endpoint takes locale in a JSON payload and returns an `HTTP 303` re
 In Firefox, this is called when the `idle-daily` event is triggered. This is guaranteed to trigger only once daily.
 
 Method: GET
+
+URL Parameters:
+
+* locale	-	User Agent locale setting
 
 ## /v2/links/fetch
 
@@ -112,3 +119,25 @@ Parameters:
 
 * `click`/`block`/`pin`/`unpin`/`sponsored`/`sponsored_link`: Only one of these can happen in one payload. The value of this `action` is the index in `tiles` for which this action applies
 * The rest of the parameters are the same as for `/v2/links/view` except for the `view` action, i.e. the `locale` and `tiles` params.
+
+## /v3/links/fetch/`locale`/`channel`
+
+The `fetch` endpoint takes locale in a JSON payload and returns an `HTTP 303` redirect to a CDN location with the content appropriate for the user agent.
+
+In Firefox, this is called when the `idle-daily` event is triggered. This is guaranteed to trigger only once daily.
+
+Method: GET
+
+URL Parameters:
+
+* locale	-	User Agent locale setting
+* channel       -       Firefox Channel the request is coming from
+* 
+
+## /v3/links/view
+
+unchanged from [/v2/links/view](#v2linksview)
+
+## /v3/links/click
+
+unchanged from [/v2/links/click](#v2linksclick)
