@@ -64,7 +64,9 @@ def fetch(locale=None):
     if localized is not None:
         # 303 hints to the client to always use GET for the redirect
         # ETag is handled by the directory link hosting server
-        response = make_response(redirect(localized, code=303))
+        resp = redirect(localized, code=303)
+        resp.data = ''
+        response = make_response(resp)
         env.log_dict(name="application", action="fetch_served", message={
             "ip": ip_addrs,
             "ua": ua,

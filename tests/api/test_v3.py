@@ -38,6 +38,7 @@ class TestNewtabServing(BaseTestCase):
             headers=[("User-Agent", "TestClient")],
             environ_base={"REMOTE_ADDR": "173.194.43.105"})
         assert_equals(response.status_code, 303)
+        assert_equals(response.content_length, 0)
 
 
 class TestClickPing(BaseTestCase):

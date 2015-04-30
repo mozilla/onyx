@@ -63,6 +63,7 @@ class TestNewtabServing(BaseTestCase):
                                     environ_base={"REMOTE_ADDR": "173.194.43.105"},
                                     data=json.dumps({'locale': 'en-US'}))
         assert_equals(response.status_code, 303)
+        assert_equals(response.content_length, 0)
 
 
 class TestClickPing(BaseTestCase):
