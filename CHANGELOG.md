@@ -1,3 +1,8 @@
+1.4.2
+=====
+
+* Ensure all API endpoints contain no contents
+
 1.4.1
 =====
 
