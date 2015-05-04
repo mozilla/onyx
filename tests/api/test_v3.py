@@ -15,7 +15,7 @@ class TestNewtabServing(BaseTestCase):
             content_type='application/json',
             headers=[("User-Agent", "TestClient")])
         assert_equals(response.status_code, 204)
-        assert_equals(int(response.headers.get('Content-Length')), 0)
+        assert_equals(response.content_length, 0)
 
     def test_unknown_country(self):
         """
@@ -27,6 +27,7 @@ class TestNewtabServing(BaseTestCase):
             headers=[("User-Agent", "TestClient")],
             environ_base={"REMOTE_ADDR": "202.224.135.69"})
         assert_equals(response.status_code, 303)
+        assert_equals(response.content_length, 0)
 
     def test_success(self):
         """
@@ -51,6 +52,7 @@ class TestClickPing(BaseTestCase):
                                     content_type='application/json',
                                     headers=[("User-Agent", "TestClient")])
         assert_equals(response.status_code, 400)
+        assert_equals(response.content_length, 0)
 
     def test_empty_payload(self):
         """
@@ -61,6 +63,7 @@ class TestClickPing(BaseTestCase):
                                     headers=[("User-Agent", "TestClient")],
                                     data=json.dumps({}))
         assert_equals(response.status_code, 200)
+        assert_equals(response.content_length, 0)
 
     def test_payload_meta(self):
         """
@@ -71,7 +74,7 @@ class TestClickPing(BaseTestCase):
                                     headers=[("User-Agent", "TestClient")],
                                     data=json.dumps({"data": "test"}))
         assert_equals(response.status_code, 200)
-        assert_equals(int(response.headers.get('Content-Length')), 0)
+        assert_equals(response.content_length, 0)
 
 
 class TestViewPing(BaseTestCase):
@@ -84,6 +87,7 @@ class TestViewPing(BaseTestCase):
                                     content_type='application/json',
                                     headers=[("User-Agent", "TestClient")])
         assert_equals(response.status_code, 400)
+        assert_equals(response.content_length, 0)
 
     def test_junk_payload(self):
         """
@@ -94,6 +98,7 @@ class TestViewPing(BaseTestCase):
                                     headers=[("User-Agent", "TestClient")],
                                     data='"hfdsfdsjkl"')
         assert_equals(response.status_code, 400)
+        assert_equals(response.content_length, 0)
 
     def test_payload_meta(self):
         """
@@ -104,4 +109,4 @@ class TestViewPing(BaseTestCase):
                                     headers=[("User-Agent", "TestClient")],
                                     data=json.dumps({"data": "test"}))
         assert_equals(response.status_code, 200)
-        assert_equals(int(response.headers.get('Content-Length')), 0)
+        assert_equals(response.content_length, 0)
