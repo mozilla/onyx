@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 
+from optparse import OptionParser
 import grequests
 import requests
-from optparse import OptionParser
+requests.packages.urllib3.disable_warnings()
 
 
 def main():
