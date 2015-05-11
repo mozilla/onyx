@@ -1,3 +1,8 @@
+1.4.4
+=====
+
+* disable urllib3 warnings in external_api_test.py
+
 1.4.3
 =====
 
