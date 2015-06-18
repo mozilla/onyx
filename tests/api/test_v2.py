@@ -60,7 +60,7 @@ class TestNewtabServing(BaseTestCase):
         """
         self.env.config.LINKS_LOCALIZATIONS = {
         }
-        response = self.client.post(url_for('v1_links.fetch'),
+        response = self.client.post(url_for('v2_links.fetch'),
                                     content_type='application/json',
                                     headers=[("User-Agent", "TestClient")],
                                     environ_base={"REMOTE_ADDR": "173.194.43.105"},
