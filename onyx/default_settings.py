@@ -15,11 +15,18 @@ class DefaultConfig(object):
 
     STATIC_ENABLED_ENVS = {'dev', 'test'}
 
-    TILE_INDEX_FILE = "tile_index.json"
-    TILE_INDEX_DIR = "/var/data/onyx/"
+    TILE_INDEX_FILES = {
+        "desktop": "/var/data/onyx/desktop_tile_index.json",
+        "desktop-prerelease": "/var/data/onyx/desktop-prerelease_tile_index.json",
+        "android": "/var/data/onyx/android_tile_index.json"
+    }
 
     ENVIRONMENT = 'dev'
-    LINKS_LOCALIZATIONS = {}
+    LINKS_LOCALIZATIONS = {
+        "desktop": None,
+        "desktop-prerelease": None,
+        "android": None
+    }
 
     GEO_DB_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/GeoLite2-Country.mmdb")
 

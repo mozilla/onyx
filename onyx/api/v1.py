@@ -1,6 +1,5 @@
 import logging
 from flask import (
-    current_app,
     Blueprint,
     request,
     make_response,
@@ -72,9 +71,22 @@ def fetch():
     except:
         country = "ERROR"
 
-    localized = current_app.config['LINKS_LOCALIZATIONS'].get("%s/%s" % (country, locale), {}).get('legacy')
+    try:
+        localized = env.config.LINKS_LOCALIZATIONS["desktop"].get("%s/%s" % (country, locale), {}).get('legacy')
+    except KeyError:
+        # fail loudly if LINKS_LOCALIZATIONS doesn't have a desktop channel. Will return with a 500 error
+        env.log_dict(name="application", action="fetch_channel_missing", message={
+            "ip": ip_addr,
+            "ua": ua,
+            "locale": locale,
+            "ver": "1",
+        })
+        env.statsd.incr("fetch_error")
+        return Response('', content_type='application/json; charset=utf-8',
+                        status=500)
+
     if localized is None:
-        localized = env.config.LINKS_LOCALIZATIONS.get("STAR/%s" % locale, {}).get('legacy')
+        localized = env.config.LINKS_LOCALIZATIONS["desktop"].get("STAR/%s" % locale, {}).get('legacy')
 
     if localized:
         # 303 hints to the client to always use GET for the redirect
