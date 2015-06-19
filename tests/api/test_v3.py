@@ -11,7 +11,7 @@ class TestNewtabServing(BaseTestCase):
         A call with an unknown locale yields an HTTP 204 response
         """
         response = self.client.get(
-            url_for('v3_links.fetch', locale='zh-CN', channel='beta'),
+            url_for('v3_links.fetch', locale='zh-CN', channel='release'),
             content_type='application/json',
             headers=[("User-Agent", "TestClient")])
         assert_equals(response.status_code, 204)
@@ -22,7 +22,7 @@ class TestNewtabServing(BaseTestCase):
         A call with an unknown country, but valid locale is success because of STAR
         """
         response = self.client.get(
-            url_for('v3_links.fetch', locale='en-US', channel='beta'),
+            url_for('v3_links.fetch', locale='en-US', channel='release'),
             content_type='application/json',
             headers=[("User-Agent", "TestClient")],
             environ_base={"REMOTE_ADDR": "202.224.135.69"})
@@ -34,12 +34,112 @@ class TestNewtabServing(BaseTestCase):
         A call with an known geo/locale pair redirects
         """
         response = self.client.get(
-            url_for('v3_links.fetch', locale='en-US', channel='beta'),
+            url_for('v3_links.fetch', locale='en-US', channel='release'),
             content_type='application/json',
             headers=[("User-Agent", "TestClient")],
             environ_base={"REMOTE_ADDR": "173.194.43.105"})
         assert_equals(response.status_code, 303)
         assert_equals(response.content_length, 0)
+
+    def test_success_channel(self):
+        """
+        A fetch with different channels succeeds
+        """
+
+        self.env.config.LINKS_LOCALIZATIONS = {
+            'desktop': {
+                'STAR/en-US': {
+                    'legacy': 'http://release.com',
+                    'ag': 'http://release.com',
+                }
+            },
+            'desktop-prerelease': {
+                'STAR/en-US': {
+                    'legacy': 'http://prerelease.com',
+                    'ag': 'http://prerelease.com',
+                }
+            }
+        }
+
+        response = self.client.get(
+            url_for('v3_links.fetch', locale='en-US', channel='release'),
+            content_type='application/json',
+            headers=[("User-Agent", "TestClient")],
+            environ_base={"REMOTE_ADDR": "173.194.43.105"})
+        assert_equals(response.status_code, 303)
+        assert_equals(response.content_length, 0)
+        assert_equals(response.headers['location'], 'http://release.com')
+
+        response_beta = self.client.get(
+            url_for('v3_links.fetch', locale='en-US', channel='beta'),
+            content_type='application/json',
+            headers=[("User-Agent", "TestClient")],
+            environ_base={"REMOTE_ADDR": "173.194.43.105"})
+        assert_equals(response_beta.status_code, 303)
+        assert_equals(response_beta.content_length, 0)
+        assert_equals(response_beta.headers['location'], 'http://prerelease.com')
+
+    def test_channel_selection_buckets(self):
+        """
+        Test pre-release and release buckets
+        """
+
+        self.env.config.LINKS_LOCALIZATIONS = {
+            'desktop': {
+                'STAR/en-US': {
+                    'legacy': 'http://release.com',
+                    'ag': 'http://release.com',
+                }
+            },
+            'desktop-prerelease': {
+                'STAR/en-US': {
+                    'legacy': 'http://prerelease.com',
+                    'ag': 'http://prerelease.com',
+                }
+            },
+            'android': {
+                'STAR/en-US': {
+                    'legacy': 'http://android.com',
+                    'ag': 'http://android.com',
+                }
+            }
+        }
+
+        test_data = {
+            'http://release.com': ('esr', 'release', 'bogus_release'),
+            'http://prerelease.com': ('beta', 'aurora', 'nightly'),
+            'http://android.com': ('android',)
+        }
+
+        for expected_location, channels in test_data.iteritems():
+
+            for channel in channels:
+                response = self.client.get(
+                    url_for('v3_links.fetch', locale='en-US', channel=channel),
+                    content_type='application/json',
+                    headers=[("User-Agent", "TestClient")],
+                    environ_base={"REMOTE_ADDR": "173.194.43.105"})
+                assert_equals(response.status_code, 303)
+                assert_equals(response.content_length, 0)
+                assert_equals(response.headers['location'], expected_location)
+
+    def test_channel_failure(self):
+        """
+        A channel configuration problem will throw a 500 error
+        """
+        self.env.config.LINKS_LOCALIZATIONS = {
+        }
+
+        channels = ('esr', 'release', 'beta', 'aurora', 'nightly', 'android', 'bogus_release')
+
+        for channel in channels:
+            response = self.client.get(
+                url_for('v3_links.fetch', locale='en-US', channel=channel),
+                content_type='application/json',
+                headers=[("User-Agent", "TestClient")],
+                environ_base={"REMOTE_ADDR": "173.194.43.105"})
+            assert_equals(response.status_code, 500)
+            assert_equals(response.content_length, 0)
 
 
 class TestClickPing(BaseTestCase):

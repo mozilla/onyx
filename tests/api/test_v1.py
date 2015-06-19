@@ -43,6 +43,20 @@ class TestNewtabServing(BaseTestCase):
         assert_equals(response.status_code, 204)
         assert_equals(response.content_length, 0)
 
+    def test_channel_failure(self):
+        """
+        A channel configuration problem will throw a 500 error
+        """
+        self.env.config.LINKS_LOCALIZATIONS = {
+        }
+        response = self.client.post(url_for('v1_links.fetch'),
+                                    content_type='application/json',
+                                    headers=[("User-Agent", "TestClient")],
+                                    environ_base={"REMOTE_ADDR": "173.194.43.105"},
+                                    data=json.dumps({'locale': 'en-US', 'directoryCount': {'organic': 1}}))
+        assert_equals(response.status_code, 500)
+        assert_equals(response.content_length, 0)
+
     def test_success(self):
         """
         A call with an known geo/locale pair redirects

@@ -2,6 +2,7 @@ from flask import (
     Blueprint,
     request,
     make_response,
+    Response,
     redirect
 )
 from onyx.environment import Environment
@@ -10,6 +11,9 @@ from onyx.api.v2 import handle_ping
 
 links = Blueprint('v3_links', __name__, url_prefix='/v3/links')
 env = Environment.instance()
+channels_valid = {'esr', 'release', 'beta', 'aurora', 'nightly', 'android'}
+channels_prerelease = {'beta', 'aurora', 'nightly'}
+channels_release = {'esr', 'release'}
 
 
 @links.route('/fetch/<locale>/<channel>', methods=['GET'])
@@ -34,11 +38,37 @@ def fetch(locale=None, channel=None):
     try:
         country = env.geoip_db.country(ip_addr).country.iso_code
     except:
-        country = "STAR"
+        country = 'STAR'
 
-    localized = env.config.LINKS_LOCALIZATIONS.get("%s/%s" % (country, locale), {}).get('ag')
+    selected_channel = 'desktop'  # default will be desktop, even in case an unrecognized channel is requested
+    if channel in channels_valid:
+        if channel in channels_prerelease:
+            selected_channel = 'desktop-prerelease'
+        elif channel in channels_release:
+            selected_channel = 'desktop'
+        else:
+            selected_channel = channel
+
+    localized = None
+
+    try:
+        localized = env.config.LINKS_LOCALIZATIONS[selected_channel].get("%s/%s" % (country, locale), {}).get('ag')
+    except KeyError:
+        # fail loudly if LINKS_LOCALIZATIONS doesn't have the desired channel. Will return with a 500 error
+        env.log_dict(name="application", action="fetch_channel_missing", message={
+            "ip": ip_addrs,
+            "ua": ua,
+            "locale": locale,
+            "channel": selected_channel,
+            "ver": "3",
+        })
+        env.statsd.incr("fetch_error")
+        return Response('', content_type='application/json; charset=utf-8',
+                        status=500)
+
+        # Note: localized could still be None if there is no country-specific tiles
     if localized is None:
-        localized = env.config.LINKS_LOCALIZATIONS.get("STAR/%s" % locale, {}).get('ag')
+        localized = env.config.LINKS_LOCALIZATIONS[selected_channel].get("STAR/%s" % locale, {}).get('ag')
 
     if localized is not None:
         # 303 hints to the client to always use GET for the redirect
