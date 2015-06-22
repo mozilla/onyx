@@ -1,3 +1,14 @@
+1.4.5
+=====
+
+* Bug 1171112 - Obtain and serve tiles for multiple channels 
+
+__note__:
+* This will require a change in puppet scripts:
+  * there are additional S3 tile index origins
+  * will require puppet template changes, due to cfg change to allow for multiple indexes
+  * cron job will need to download 3 files instead of just 1
+
 1.4.4
 =====
 
