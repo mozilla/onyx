@@ -164,13 +164,11 @@ def _read_tile_index_loop(env, failure_sleep_duration=5, success_sleep_duration=
                     "status_code": r.status_code,
                 })
                 errored = True
-                return
+                continue
 
             try:
-                print "trying"
                 env.config.LINKS_LOCALIZATIONS[channels[i]] = r.json()
             except Exception, e:
-                print e
                 env.log_dict(name="application", action="gevent_tiles_update_error", message={
                     "err": e.message,
                     "traceback": traceback.format_exc(),
