@@ -63,3 +63,32 @@ class TestReadLoop(BaseTestCase):
 
         env.log_dict.assert_any_calls()
         assert_equals('gevent_tiles_update_error', env.log_dict.call_args[1]['action'])
+
+    def test_index_request_failure(self):
+        """
+        Test request failure
+        """
+        env = Environment.instance()
+
+        env.config = Mock()
+        env.config.TILE_INDEX_FILES = {'desktop': 'some_url'}
+        env.log_dict = Mock()
+
+        class TestResponse:
+            status_code = 500
+
+            def json(self):
+                assert(False)
+
+        onyx.environment.grequests.map = Mock(return_value=[TestResponse()])
+
+        index_mock = MagicMock()
+        env.config.LINKS_LOCALIZATIONS = index_mock
+
+        gevent.spawn(_read_tile_index_loop, env)
+
+        gevent.sleep(0)  # make the event loop tick
+        assert_equals(0, index_mock.call_count)
+
+        env.log_dict.assert_any_calls()
+        assert_equals('gevent_tiles_update_error', env.log_dict.call_args[1]['action'])
