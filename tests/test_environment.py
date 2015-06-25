@@ -1,8 +1,7 @@
-import json
 import gevent
-from tempfile import NamedTemporaryFile
 from nose.tools import assert_equals
 from mock import Mock, MagicMock
+import onyx.environment
 from onyx.environment import Environment, _read_tile_index_loop
 from tests.base import BaseTestCase
 
@@ -14,14 +13,19 @@ class TestReadLoop(BaseTestCase):
         Test reading v3 tile indexes
         """
         env = Environment.instance()
-        test_file = NamedTemporaryFile()
 
         env.config = Mock()
-        env.config.TILE_INDEX_FILES = {'desktop': test_file.name}
+        env.config.TILE_INDEX_FILES = {'desktop': 'some_url'}
 
         v3_data = {'STAR/en-US': {'legacy': 'data'}, '__ver__': 3}
-        json.dump(v3_data, test_file)
-        test_file.flush()
+
+        class TestResponse:
+            status_code = 200
+
+            def json(self):
+                return v3_data
+
+        onyx.environment.grequests.map = Mock(return_value=[TestResponse()])
 
         index_mock = MagicMock()
         env.config.LINKS_LOCALIZATIONS = index_mock
@@ -36,15 +40,18 @@ class TestReadLoop(BaseTestCase):
         Test json file read failure
         """
         env = Environment.instance()
-        test_file = NamedTemporaryFile()
 
         env.config = Mock()
-        env.config.TILE_INDEX_FILES = {'desktop': test_file.name}
+        env.config.TILE_INDEX_FILES = {'desktop': 'some_url'}
         env.log_dict = Mock()
 
-        v3_data = "{'STAR/en-US': {'legacy': 'data'}, '__ver__': 3"
-        test_file.write(v3_data)
-        test_file.flush()
+        class TestResponse:
+            status_code = 200
+
+            def json(self):
+                raise Exception("error")
+
+        onyx.environment.grequests.map = Mock(return_value=[TestResponse()])
 
         index_mock = MagicMock()
         env.config.LINKS_LOCALIZATIONS = index_mock
