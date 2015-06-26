@@ -82,9 +82,9 @@ def main():
                             '%s/v3/links/fetch/%s/%s' %
                             (onyx, locale, release)
                         )
-                    if url not in urls:
-                        urls[url] = set()
-                    urls[url].add(value['ag'])
+                        if url not in urls:
+                            urls[url] = set()
+                        urls[url].add(value['ag'])
 
             # request urls
             results = grequests.map(
