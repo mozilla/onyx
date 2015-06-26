@@ -99,8 +99,8 @@ def main():
                         )
                     elif options.verbose:
                         print('SUCCESS: %s %s' % (r.url, r.status_code))
-                else:
-                    errors += 1
+                    else:
+                        errors += 1
         except:
             print traceback.format_exc()
             errors += 1
