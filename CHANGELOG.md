@@ -1,3 +1,8 @@
+1.4.7
+=====
+
+* add new indexes to verification script
+
 1.4.6
 =====
 
