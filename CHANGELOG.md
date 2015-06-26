@@ -1,3 +1,8 @@
+1.4.8
+=====
+
+* fix verification scripts to call using release names
+
 1.4.7
 =====
 
