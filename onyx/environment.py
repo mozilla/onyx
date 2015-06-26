@@ -10,6 +10,9 @@ from mock import Mock
 from statsd import StatsClient
 import geoip2.database
 import gevent
+import grequests
+import requests
+requests.packages.urllib3.disable_warnings()
 
 
 class EnvironmentUninitializedError(Exception):
@@ -138,18 +141,41 @@ class Environment(object):
         raise EnvironmentUninitializedError("Cannot obtain instance if uninitialized")
 
 
-def _read_tile_index_loop(env, failure_sleep_duration=5, success_sleep_duration=15 * 60):
-    """wait for 15 minutes (greenlet), then open tile index file and replace LINKS_LOCALIZATIONS"""
+def _read_tile_index_loop(env, failure_sleep_duration=5, success_sleep_duration=60):
+    """wait for 1 minute (greenlet), then download the index file and replace LINKS_LOCALIZATIONS"""
     while True:
-        for channel, filepath in env.config.TILE_INDEX_FILES.iteritems():
+
+        tiles_urls = []
+        channels = []
+
+        for channel, url in env.config.TILE_INDEX_FILES.iteritems():
+            tiles_urls.append(url)
+            channels.append(channel)
+
+        results = grequests.map(
+            grequests.get(url, allow_redirects=False)
+            for url in tiles_urls)
+
+        errored = False
+        for i, r in enumerate(results):
+            if r.status_code != 200:
+                env.log_dict(name="application", action="gevent_tiles_update_error", message={
+                    "url": tiles_urls[i],
+                    "status_code": r.status_code,
+                })
+                errored = True
+                continue
+
             try:
-                with open(filepath, "r") as fp:
-                    data = fp.read()
-                    env.config.LINKS_LOCALIZATIONS[channel] = ujson.decode(data)
-                gevent.sleep(success_sleep_duration)
+                env.config.LINKS_LOCALIZATIONS[channels[i]] = r.json()
             except Exception, e:
                 env.log_dict(name="application", action="gevent_tiles_update_error", message={
                     "err": e.message,
                     "traceback": traceback.format_exc(),
                 })
-                gevent.sleep(failure_sleep_duration)
+
+        sleep_duration = success_sleep_duration
+        if errored:
+            sleep_duration = failure_sleep_duration
+
+        gevent.sleep(sleep_duration)
