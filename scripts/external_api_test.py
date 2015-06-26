@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from optparse import OptionParser
+import traceback
 import grequests
 import requests
 requests.packages.urllib3.disable_warnings()
@@ -38,12 +39,18 @@ def main():
     elif len(args) > 2:
         parser.parse_args(['-h'])
 
-    for channel in ['desktop', 'desktop-prerelease', 'android']:
+    channel_mapping = {
+        'desktop': ['esr', 'release'],
+        'desktop-prerelease': ['beta', 'aurora', 'nightly'],
+        'android': ['android']
+    }
+
+    for channel_name, release_names in channel_mapping.iteritems():
         try:
             # get tile index
             r = requests.get(
                 '%s/%s_tile_index_v3.json' %
-                (cdn, channel),
+                (cdn, channel_name),
                 allow_redirects=False
             )
 
@@ -66,33 +73,36 @@ def main():
                     urls[url].add(value['legacy'])
 
                     # v3 urls
-                    url = (
-                        '%s/v3/links/fetch/%s/%s' %
-                        (onyx, locale, channel)
-                    )
-                    if url not in urls:
-                        urls[url] = set()
-                    urls[url].add(value['ag'])
+                    for release in release_names:
+                        url = (
+                            '%s/v3/links/fetch/%s/%s' %
+                            (onyx, locale, release)
+                        )
+                        if url not in urls:
+                            urls[url] = set()
+                        urls[url].add(value['ag'])
 
             # request urls
             results = grequests.map(
                 grequests.get(url, allow_redirects=False)
-                for url in urls.keys()
-            )
+                for url in urls.keys())
 
             # validate results
             for r in results:
-                if r.status_code != 303:
-                    print('ERROR: %s %s' % (r.url, r.status_code))
-                elif r.headers['location'] not in urls[r.url]:
-                    print(
-                        'ERROR: %s %s != %s' %
-                        (r.url, r.headers['location'], list(urls[r.url]))
-                    )
-                elif options.verbose:
-                    print('SUCCESS: %s %s' % (r.url, r.status_code))
-        except Exception as e:
-            print e
+                if r:
+                    if r.status_code != 303:
+                        print('ERROR: %s %s' % (r.url, r.status_code))
+                    elif r.headers['location'] not in urls[r.url]:
+                        print(
+                            'ERROR: %s %s != %s' %
+                            (r.url, r.headers['location'], list(urls[r.url]))
+                        )
+                    elif options.verbose:
+                        print('SUCCESS: %s %s' % (r.url, r.status_code))
+                    else:
+                        errors += 1
+        except:
+            print traceback.format_exc()
             errors += 1
 
     if errors > 0:
