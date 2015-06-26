@@ -1,3 +1,12 @@
+1.4.6
+=====
+
+* Bug 1159920 - Refactor onyx to read the tile index directly from the origin
+
+__note__:
+* Requires a change in puppet scripts:
+ * TILE_INDEX_FILES now takes urls instead of file paths
+
 1.4.5
 =====
 
