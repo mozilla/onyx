@@ -10,5 +10,9 @@ setup(
     packages=find_packages(),
     package_data={"": ["*.mmdb"]},
     include_package_data=True,
-    scripts=["scripts/manage.py", "scripts/external_api_test.py"],
+    scripts=[
+        "scripts/manage.py",
+        "scripts/external_api_test.py",
+        "scripts/geoip_api_test.py",
+    ],
 )
