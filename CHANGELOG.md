@@ -1,3 +1,8 @@
+1.4.9
+=====
+
+* write script for testing fetch responses with geoip handling
+
 1.4.8
 =====
 
