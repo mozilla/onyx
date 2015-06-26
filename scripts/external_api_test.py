@@ -38,7 +38,7 @@ def main():
     elif len(args) > 2:
         parser.parse_args(['-h'])
 
-    for channel in ['desktop']:
+    for channel in ['desktop', 'desktop-prerelease', 'android']:
         try:
             # get tile index
             r = requests.get(
