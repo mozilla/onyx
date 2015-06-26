@@ -45,10 +45,6 @@ def main():
         'android': ['android']
     }
 
-    def onyx_handler(req, exc):
-        print "handling"
-        return
-
     for channel_name, release_names in channel_mapping.iteritems():
         try:
             # get tile index
