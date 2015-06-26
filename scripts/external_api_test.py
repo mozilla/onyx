@@ -39,7 +39,6 @@ def main():
     elif len(args) > 2:
         parser.parse_args(['-h'])
 
-    release_names = ('esr', 'release', 'beta', 'aurora', 'nightly', 'android')
     channel_mapping = {
         'desktop': ['esr', 'release'],
         'desktop-prerelease': ['beta', 'aurora', 'nightly'],
