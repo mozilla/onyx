@@ -1,3 +1,8 @@
+1.4.10
+=====
+
+* fix verification scripts to make sure v2 endpoints are only for the `desktop` channel
+
 1.4.9
 =====
 
