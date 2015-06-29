@@ -66,11 +66,12 @@ def main():
                 if '/' in key:
                     locale = key.split('/', 1).pop()
 
-                    # v2 urls
-                    url = onyx + '/v2/links/fetch/' + locale
-                    if url not in urls:
-                        urls[url] = set()
-                    urls[url].add(value['legacy'])
+                    # v2 urls, only for desktop
+                    if channel_name == 'desktop':
+                        url = onyx + '/v2/links/fetch/' + locale
+                        if url not in urls:
+                            urls[url] = set()
+                        urls[url].add(value['legacy'])
 
                     # v3 urls
                     for release in release_names:
@@ -85,22 +86,25 @@ def main():
             # request urls
             results = grequests.map(
                 grequests.get(url, allow_redirects=False)
-                for url in urls.keys())
+                for url in sorted(urls.keys()))
 
             # validate results
             for r in results:
                 if r:
                     if r.status_code != 303:
                         print('ERROR: %s %s' % (r.url, r.status_code))
+                        errors += 1
                     elif r.headers['location'] not in urls[r.url]:
                         print(
                             'ERROR: %s %s != %s' %
-                            (r.url, r.headers['location'], list(urls[r.url]))
+                            (r.url, r.headers['location'], ' '.join(sorted(list(urls[r.url]))))
                         )
+                        errors += 1
                     elif options.verbose:
                         print('SUCCESS: %s %s' % (r.url, r.status_code))
-                    else:
-                        errors += 1
+                else:
+                    print('ERROR: {}'.format(r.url))
+                    errors += 1
         except:
             print traceback.format_exc()
             errors += 1
