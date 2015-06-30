@@ -84,9 +84,10 @@ def main():
                         urls[url].add(value['ag'])
 
             # request urls
-            results = grequests.map(
-                grequests.get(url, allow_redirects=False)
-                for url in sorted(urls.keys()))
+            results = grequests.imap(
+                (grequests.get(url, allow_redirects=False)
+                for url in sorted(urls.keys())),
+                size=10)
 
             # validate results
             for r in results:
