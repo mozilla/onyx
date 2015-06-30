@@ -36,7 +36,7 @@ def main():
         '--channels',
         action='append',
         dest='channels',
-        help='Path to GeoIP2-Country-Locations-en.csv',
+        help='Channels to test',
         metavar='CSV',
     )
     parser.add_option(
@@ -77,7 +77,7 @@ def main():
     errors = 0
 
     if not options.channels:
-        options.channels = ['desktop']
+        options.channels = ('desktop', 'desktop-prerelease', 'android')
 
     if len(args) > 0:
         parser.parse_args(['-h'])
@@ -89,9 +89,15 @@ def main():
         )
         print('NOTICE: downloading indexes')
 
+    channel_mapping = {
+        'desktop': ['esr', 'release'],
+        'desktop-prerelease': ['beta', 'aurora', 'nightly'],
+        'android': ['android']
+    }
+
     indexes = [
         (channel, index)
-        for channel in options.channels
+        for channel in channel_mapping.keys()
         for index in grequests.map([
             grequests.get(
                 '%s/%s_%s' %
@@ -107,6 +113,7 @@ def main():
 
     countries = {}
     for channel, index in indexes:
+        release_names = channel_mapping[channel]
         try:
             if index.status_code != 200:
                 print('ERROR: %s %s' % (index.url, index.status_code))
@@ -127,11 +134,12 @@ def main():
                         countries[country][url] = value['legacy']
 
                     # v3 urls
-                    url = (
-                        '%s/v3/links/fetch/%s/%s' %
-                        (onyx, locale, channel)
-                    )
-                    countries[country][url] = value['ag']
+                    for release in release_names:
+                        url = (
+                            '%s/v3/links/fetch/%s/%s' %
+                            (onyx, locale, release)
+                        )
+                        countries[country][url] = value['ag']
         except Exception as e:
             print('ERROR: %s' % e)
             errors += 1
@@ -191,17 +199,15 @@ def main():
         print('NOTICE: requesting urls')
 
     # request urls
-    results_by_country = {
-        country: grequests.map(
-            grequests.get(
+    results_by_country = {}
+    for country, urls in countries.iteritems():
+        results_by_country[country] = grequests.imap(
+            (grequests.get(
                 url,
                 allow_redirects=False,
-                headers={'X-Geoip-Override': ips[country]}
-            )
-            for url in urls.keys()
-        )
-        for country, urls in countries.iteritems()
-    }
+                headers={'X-Geoip-Override': ips[country]})
+                for url in urls.keys()),
+            size=10)
 
     if not options.quiet:
         print('NOTICE: requested %s urls' % len(results_by_country))
