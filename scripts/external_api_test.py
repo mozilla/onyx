@@ -85,8 +85,9 @@ def main():
 
             # request urls
             results = grequests.imap(
-                (grequests.get(url, allow_redirects=False)
-                for url in sorted(urls.keys())),
+                (
+                    grequests.get(url, allow_redirects=False)
+                    for url in sorted(urls.keys())),
                 size=10)
 
             # validate results
