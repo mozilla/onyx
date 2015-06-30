@@ -1,5 +1,10 @@
+1.4.11
+======
+
+* Monitoring test improvements: working geoip test + faster external_api_test
+
 1.4.10
-=====
+======
 
 * fix verification scripts to make sure v2 endpoints are only for the `desktop` channel
 
