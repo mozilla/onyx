@@ -1,3 +1,8 @@
+1.4.12
+======
+
+* Handle errors better in the downloader code and improve monitoring scripts
+
 1.4.11
 ======
 
