@@ -145,34 +145,45 @@ def _read_tile_index_loop(env, failure_sleep_duration=5, success_sleep_duration=
     """wait for 1 minute (greenlet), then download the index file and replace LINKS_LOCALIZATIONS"""
     while True:
 
-        tiles_urls = []
-        channels = []
+        try:
+            tiles_urls = []
+            channels = []
 
-        for channel, url in env.config.TILE_INDEX_FILES.iteritems():
-            tiles_urls.append(url)
-            channels.append(channel)
+            for channel, url in env.config.TILE_INDEX_FILES.iteritems():
+                tiles_urls.append(url)
+                channels.append(channel)
 
-        results = grequests.map(
-            grequests.get(url, allow_redirects=False)
-            for url in tiles_urls)
+            results = grequests.imap(
+                (
+                    grequests.get(url, allow_redirects=False)
+                    for url in tiles_urls),
+                size=5)
 
-        errored = False
-        for i, r in enumerate(results):
-            if r.status_code != 200:
-                env.log_dict(name="application", action="gevent_tiles_update_error", message={
-                    "url": tiles_urls[i],
-                    "status_code": r.status_code,
-                })
-                errored = True
-                continue
+            errored = False
+            for i, r in enumerate(results):
+                if r.status_code != 200:
+                    env.log_dict(name="application", action="gevent_tiles_server_update_error", message={
+                        "url": tiles_urls[i],
+                        "status_code": r.status_code
+                    })
+                    errored = True
+                    continue
 
-            try:
-                env.config.LINKS_LOCALIZATIONS[channels[i]] = r.json()
-            except Exception, e:
-                env.log_dict(name="application", action="gevent_tiles_update_error", message={
-                    "err": e.message,
-                    "traceback": traceback.format_exc(),
-                })
+                try:
+                    env.config.LINKS_LOCALIZATIONS[channels[i]] = r.json()
+                except Exception, e:
+                    env.log_dict(name="application", action="gevent_tiles_payload_error", message={
+                        "err": e.message,
+                        "traceback": traceback.format_exc()
+                    })
+                    errored = True
+                    continue
+        except Exception, e:
+            env.log_dict(name="application", action="gevent_tiles_request_error", message={
+                "err": e.message,
+                "traceback": traceback.format_exc()
+            })
+            errored = True
 
         sleep_duration = success_sleep_duration
         if errored:

@@ -16,9 +16,9 @@ class DefaultConfig(object):
     STATIC_ENABLED_ENVS = {'dev', 'test'}
 
     TILE_INDEX_FILES = {
-        "desktop": "https://tiles.cdn.mozilla.net/desktop_tile_index.json",
-        "desktop-prerelease": "https://tiles.cdn.mozilla.net/desktop-prerelease_tile_index.json",
-        "android": "https://tiles.cdn.mozilla.net/android_tile_index.json"
+        "desktop": "https://tiles.cdn.mozilla.net/desktop_tile_index_v3.json",
+        "desktop-prerelease": "https://tiles.cdn.mozilla.net/desktop-prerelease_tile_index_v3.json",
+        "android": "https://tiles.cdn.mozilla.net/android_tile_index_v3.json"
     }
 
     ENVIRONMENT = 'dev'
