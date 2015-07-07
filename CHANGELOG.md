@@ -1,3 +1,8 @@
+1.4.13
+======
+
+* ensure update loop requests are correct and executed in the right order
+
 1.4.12
 ======
 
