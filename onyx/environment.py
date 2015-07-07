@@ -153,7 +153,7 @@ def _read_tile_index_loop(env, failure_sleep_duration=5, success_sleep_duration=
                 tiles_urls.append(url)
                 channels.append(channel)
 
-            results = grequests.imap(
+            results = grequests.map(
                 (
                     grequests.get(url, allow_redirects=False)
                     for url in tiles_urls),

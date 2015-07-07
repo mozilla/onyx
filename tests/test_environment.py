@@ -25,7 +25,7 @@ class TestReadLoop(BaseTestCase):
             def json(self):
                 return v3_data
 
-        onyx.environment.grequests.imap = Mock(return_value=[TestResponse()])
+        onyx.environment.grequests.map = Mock(return_value=[TestResponse()])
 
         index_mock = MagicMock()
         env.config.LINKS_LOCALIZATIONS = index_mock
@@ -51,7 +51,7 @@ class TestReadLoop(BaseTestCase):
             def json(self):
                 raise Exception("error")
 
-        onyx.environment.grequests.imap = Mock(return_value=[TestResponse()])
+        onyx.environment.grequests.map = Mock(return_value=[TestResponse()])
 
         index_mock = MagicMock()
         env.config.LINKS_LOCALIZATIONS = index_mock
@@ -80,7 +80,7 @@ class TestReadLoop(BaseTestCase):
             def json(self):
                 assert(False)
 
-        onyx.environment.grequests.imap = Mock(return_value=[TestResponse()])
+        onyx.environment.grequests.map = Mock(return_value=[TestResponse()])
 
         index_mock = MagicMock()
         env.config.LINKS_LOCALIZATIONS = index_mock
@@ -93,6 +93,58 @@ class TestReadLoop(BaseTestCase):
         env.log_dict.assert_any_calls()
         assert_equals('gevent_tiles_server_update_error', env.log_dict.call_args[1]['action'])
 
+    def test_index_request_correctness(self):
+        """
+        Test requests are correct and executed in the right order
+        """
+        env = Environment.instance()
+
+        key_mirror = {
+            'desktop': 'http://desktop.url',
+            'desktop-prerelease': 'http://desktop-prerelease.url',
+            'android': 'http://android.url'
+        }
+
+        env.config = Mock()
+        env.config.TILE_INDEX_FILES = key_mirror
+        env.log_dict = Mock()
+
+        class TestResponse:
+            status_code = 200
+
+            def __init__(self, url):
+                self.url = url
+
+            def json(self):
+                # instead of JSON data, return a URL
+                return self.url
+
+        def map_response(*args, **kwargs):
+            urls = args[0]
+            output = []
+            for url in urls:
+                output.append(TestResponse(url))
+            return output
+
+        def get_response(*args, **kwargs):
+            return args[0]
+
+        onyx.environment.grequests.map = Mock(side_effect=map_response)
+        onyx.environment.grequests.get = Mock(side_effect=get_response)
+
+        env.config.LINKS_LOCALIZATIONS = {
+            'desktop': None,
+            'desktop-prerelease': None,
+            'android': None,
+        }
+
+        gevent.spawn(_read_tile_index_loop, env)
+
+        gevent.sleep(0)  # make the event loop tick
+
+        env.log_dict.assert_no_calls()
+        assert_equals(key_mirror, env.config.LINKS_LOCALIZATIONS)
+
     def test_index_request_failure(self):
         """
         Test request failure
@@ -103,9 +155,9 @@ class TestReadLoop(BaseTestCase):
         env.config.TILE_INDEX_FILES = {'desktop': 'some_url'}
         env.log_dict = Mock()
 
-        imap_mock = Mock()
-        imap_mock.side_effect = Exception('some grequests error')
-        onyx.environment.grequests.imap = imap_mock
+        map_mock = Mock()
+        map_mock.side_effect = Exception('some grequests error')
+        onyx.environment.grequests.map = map_mock
 
         index_mock = MagicMock()
         env.config.LINKS_LOCALIZATIONS = index_mock
