@@ -114,7 +114,7 @@ class Environment(object):
 
         # Application server setup
         app = Flask('onyx')
-        CORS(app, resources={r'/*': {'origins':'*'}}, allow_headers='Content-Type')
+        CORS(app, resources={r'/*': {'origins': '*'}}, allow_headers='Content-Type')
         app.config.from_object(self.__config_filename)
 
         if app.config['ENVIRONMENT'] not in app.config['STATIC_ENABLED_ENVS']:
