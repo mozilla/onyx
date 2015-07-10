@@ -6,6 +6,7 @@ import ujson
 import traceback
 
 from flask import Flask
+from flask.ext.cors import CORS
 from mock import Mock
 from statsd import StatsClient
 import geoip2.database
@@ -113,6 +114,7 @@ class Environment(object):
 
         # Application server setup
         app = Flask('onyx')
+        CORS(app, resources={r'/*': {'origins':'*'}}, allow_headers='Content-Type')
         app.config.from_object(self.__config_filename)
 
         if app.config['ENVIRONMENT'] not in app.config['STATIC_ENABLED_ENVS']:
