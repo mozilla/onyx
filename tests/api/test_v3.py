@@ -51,6 +51,7 @@ class TestNewtabServing(BaseTestCase):
             headers=[("User-Agent", "TestClient")],
             environ_base={"REMOTE_ADDR": "173.194.43.105"})
         assert_equals(response.status_code, 200)
+        assert_equals(response.headers.get('Content-Type'), 'text/plain; charset=utf-8')
 
     def test_success_channel(self):
         """
