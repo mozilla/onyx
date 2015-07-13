@@ -1,3 +1,8 @@
+1.4.14
+======
+
+* Bug 1182602 - Set CORS allow-origin header for fetch endpoint
+
 1.4.13
 ======
 
