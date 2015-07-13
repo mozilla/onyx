@@ -41,6 +41,17 @@ class TestNewtabServing(BaseTestCase):
         assert_equals(response.status_code, 303)
         assert_equals(response.content_length, 0)
 
+    def test_success_noredirect(self):
+        """
+        Noredirect parameter on fetch returns 200
+        """
+        response = self.client.get(
+            url_for('v3_links.fetch', locale='en-US', channel='release', noredirect=''),
+            content_type='application/json',
+            headers=[("User-Agent", "TestClient")],
+            environ_base={"REMOTE_ADDR": "173.194.43.105"})
+        assert_equals(response.status_code, 200)
+
     def test_success_channel(self):
         """
         A fetch with different channels succeeds

@@ -71,11 +71,19 @@ def fetch(locale=None, channel=None):
         localized = env.config.LINKS_LOCALIZATIONS[selected_channel].get("STAR/%s" % locale, {}).get('ag')
 
     if localized is not None:
-        # 303 hints to the client to always use GET for the redirect
-        # ETag is handled by the directory link hosting server
-        resp = redirect(localized, code=303)
-        resp.data = ''
-        response = make_response(resp)
+        no_redirect = request.args.get('noredirect')
+
+        if no_redirect is not None:
+            # the noredirect query parameter is specified, intended for Firefox Hello
+            # the not-None condition is to allow for ?noredirect without any value
+            response = Response(localized, mimetype='text/plain')
+        else:
+            # 303 hints to the client to always use GET for the redirect
+            # ETag is handled by the directory link hosting server
+            resp = redirect(localized, code=303)
+            resp.data = ''
+            response = make_response(resp)
+
         env.log_dict(name="application", action="fetch_served", message={
             "ip": ip_addrs,
             "ua": ua,
