@@ -11,7 +11,7 @@ from onyx.api.v2 import handle_ping
 
 links = Blueprint('v3_links', __name__, url_prefix='/v3/links')
 env = Environment.instance()
-channels_valid = {'esr', 'release', 'beta', 'aurora', 'nightly', 'android'}
+channels_valid = {'esr', 'release', 'beta', 'aurora', 'nightly', 'android', 'hello'}
 channels_prerelease = {'beta', 'aurora', 'nightly'}
 channels_release = {'esr', 'release'}
 

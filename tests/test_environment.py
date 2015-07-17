@@ -102,7 +102,8 @@ class TestReadLoop(BaseTestCase):
         key_mirror = {
             'desktop': 'http://desktop.url',
             'desktop-prerelease': 'http://desktop-prerelease.url',
-            'android': 'http://android.url'
+            'android': 'http://android.url',
+            'hello': 'http://hello.url'
         }
 
         env.config = Mock()
@@ -136,6 +137,7 @@ class TestReadLoop(BaseTestCase):
             'desktop': None,
             'desktop-prerelease': None,
             'android': None,
+            'hello': None
         }
 
         gevent.spawn(_read_tile_index_loop, env)

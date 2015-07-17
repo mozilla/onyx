@@ -42,7 +42,8 @@ def main():
     channel_mapping = {
         'desktop': ['esr', 'release'],
         'desktop-prerelease': ['beta', 'aurora', 'nightly'],
-        'android': ['android']
+        'android': ['android'],
+        'hello': ['hello']
     }
 
     for channel_name, release_names in channel_mapping.iteritems():

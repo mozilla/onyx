@@ -102,13 +102,20 @@ class TestNewtabServing(BaseTestCase):
                     'legacy': 'http://android.com',
                     'ag': 'http://android.com',
                 }
+            },
+            'hello': {
+                'STAR/en-US': {
+                    'legacy': 'http://hello.com',
+                    'ag': 'http://hello.com',
+                }
             }
         }
 
         test_data = {
             'http://release.com': ('esr', 'release', 'bogus_release'),
             'http://prerelease.com': ('beta', 'aurora', 'nightly'),
-            'http://android.com': ('android',)
+            'http://android.com': ('android',),
+            'http://hello.com': ('hello',)
         }
 
         for expected_location, channels in test_data.iteritems():
@@ -130,7 +137,8 @@ class TestNewtabServing(BaseTestCase):
         self.env.config.LINKS_LOCALIZATIONS = {
         }
 
-        channels = ('esr', 'release', 'beta', 'aurora', 'nightly', 'android', 'bogus_release')
+        channels = ('esr', 'release', 'beta', 'aurora', 'nightly', 'android',
+                    'hello' 'bogus_release')
 
         for channel in channels:
             response = self.client.get(

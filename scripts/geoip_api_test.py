@@ -77,7 +77,7 @@ def main():
     errors = 0
 
     if not options.channels:
-        options.channels = ('desktop', 'desktop-prerelease', 'android')
+        options.channels = ('desktop', 'desktop-prerelease', 'android', 'hello')
 
     if len(args) > 0:
         parser.parse_args(['-h'])
@@ -92,7 +92,8 @@ def main():
     channel_mapping = {
         'desktop': ['esr', 'release'],
         'desktop-prerelease': ['beta', 'aurora', 'nightly'],
-        'android': ['android']
+        'android': ['android'],
+        'hello': ['hello']
     }
 
     indexes = [

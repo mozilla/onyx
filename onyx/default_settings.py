@@ -18,14 +18,16 @@ class DefaultConfig(object):
     TILE_INDEX_FILES = {
         "desktop": "https://tiles.cdn.mozilla.net/desktop_tile_index_v3.json",
         "desktop-prerelease": "https://tiles.cdn.mozilla.net/desktop-prerelease_tile_index_v3.json",
-        "android": "https://tiles.cdn.mozilla.net/android_tile_index_v3.json"
+        "android": "https://tiles.cdn.mozilla.net/android_tile_index_v3.json",
+        "hello": "https://tiles.cdn.mozilla.net/hello_tile_index_v3.json"
     }
 
     ENVIRONMENT = 'dev'
     LINKS_LOCALIZATIONS = {
         "desktop": None,
         "desktop-prerelease": None,
-        "android": None
+        "android": None,
+        "hello": None
     }
 
     GEO_DB_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/GeoLite2-Country.mmdb")
