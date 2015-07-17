@@ -1,3 +1,8 @@
+1.4.15
+======
+
+* Bug 1184208 - Update automated tests for onyx/splice to include `hello` channel
+
 1.4.14
 ======
 
