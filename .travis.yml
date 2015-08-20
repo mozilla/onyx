@@ -1,14 +1,13 @@
-sudo: false
-language: python
-python:
-  - "2.7"
-cache:
-    directories:
-        - .pip_download_cache
-        - "$HOME/virtualenv/python2.7.9"
-# command to install dependencies
-install: pip install -r requirements.txt -r requirements-dev.txt
-# command to run the build
-script: fab build
+sudo: required
+
+services:
+    - docker
+
+before_install:
+    - docker build -t mozilla/onyx .
+    
+script:
+    - docker run mozilla/onyx /bin/sh -c "pip install -r requirements-dev.txt; fab build"
+
 after_success:
   - coveralls
