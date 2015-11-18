@@ -72,7 +72,11 @@ def main():
                         url = onyx + '/v2/links/fetch/' + locale
                         if url not in urls:
                             urls[url] = set()
-                        urls[url].add(value['legacy'])
+                        v = value['legacy']
+                        if isinstance(v, list):
+                            urls[url].union(v)
+                        else:
+                            urls[url].add(v)
 
                     # v3 urls
                     for release in release_names:
@@ -82,7 +86,11 @@ def main():
                         )
                         if url not in urls:
                             urls[url] = set()
-                        urls[url].add(value['ag'])
+                        v = value['ag']
+                        if isinstance(v, list):
+                            urls[url].union(v)
+                        else:
+                            urls[url].add(v)
 
             # request urls
             results = grequests.imap(

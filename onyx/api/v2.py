@@ -1,4 +1,5 @@
 import logging
+import random
 from flask import (
     Blueprint,
     request,
@@ -73,6 +74,9 @@ def fetch(locale=None):
 
     if localized is None:
         localized = env.config.LINKS_LOCALIZATIONS["desktop"].get("STAR/%s" % locale, {}).get('legacy')
+
+    if isinstance(localized, list):
+        localized = random.choice(localized) if localized else None
 
     if localized is not None:
         # 303 hints to the client to always use GET for the redirect

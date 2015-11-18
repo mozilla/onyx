@@ -1,3 +1,5 @@
+import random
+
 from flask import (
     Blueprint,
     request,
@@ -69,6 +71,9 @@ def fetch(locale=None, channel=None):
         # Note: localized could still be None if there is no country-specific tiles
     if localized is None:
         localized = env.config.LINKS_LOCALIZATIONS[selected_channel].get("STAR/%s" % locale, {}).get('ag')
+
+    if isinstance(localized, list):
+        localized = random.choice(localized) if localized else None
 
     if localized is not None:
         # 303 hints to the client to always use GET for the redirect

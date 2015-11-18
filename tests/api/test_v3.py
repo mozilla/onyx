@@ -1,6 +1,6 @@
 import json
 from flask import url_for
-from nose.tools import assert_equals
+from nose.tools import assert_equals, assert_true
 from tests.base import BaseTestCase
 
 
@@ -78,6 +78,37 @@ class TestNewtabServing(BaseTestCase):
         assert_equals(response_beta.status_code, 303)
         assert_equals(response_beta.content_length, 0)
         assert_equals(response_beta.headers['location'], 'http://prerelease.com')
+
+    def test_success_multiple_distribution(self):
+        """
+        A fetch to tile index with multiple distributions succeeds
+        """
+
+        distributions = ['http://release1.com', 'http://release2.com', 'http://release3.com']
+        self.env.config.LINKS_LOCALIZATIONS = {
+            'desktop': {
+                'STAR/en-US': {
+                    'legacy': distributions,
+                    'ag': distributions
+                }
+            }
+        }
+
+        # fetching for finite times, we should be able to get all the possible distributions
+        dists = []
+        while True:
+            response = self.client.get(
+                url_for('v3_links.fetch', locale='en-US', channel='release'),
+                content_type='application/json',
+                headers=[("User-Agent", "TestClient")],
+                environ_base={"REMOTE_ADDR": "173.194.43.105"})
+            assert_equals(response.status_code, 303)
+            assert_equals(response.content_length, 0)
+            assert_true(response.headers['location'] in distributions)
+            dists.append(response.headers['location'])
+            if len(set(dists)) == len(distributions):
+                break
+        assert_equals(set(distributions), set(dists))
 
     def test_channel_selection_buckets(self):
         """
