@@ -1,3 +1,8 @@
+1.4.16
+======
+
+* Issue #33 - Add support for multiple distributions
+
 1.4.15
 ======
 
