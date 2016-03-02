@@ -1,4 +1,5 @@
 import random
+import ujson
 
 from flask import (
     Blueprint,
@@ -119,6 +120,43 @@ def click():
     Log tile ping sent from Firefox on each tile action
     """
     return handle_ping("click", api_version="3")
+
+
+@links.route('/activity-stream', methods=['POST'])
+@env.statsd.timer('v3_links_activity_stream')
+def activity_stream():
+    """Log activity stream ping sent from Firefox on each session"""
+    ip_addr = None
+    ua = None
+    ping_type = 'activity_stream'
+
+    try:
+        client_payload_raw = request.get_data(cache=False)
+        client_payload = ujson.decode(client_payload_raw)
+
+        ip_addr = request.headers.get('X-Forwarded-For')
+        if ip_addr is None:
+            ip_addr = request.remote_addr
+
+        ua = request.headers.get('User-Agent')
+        client_payload["ua"] = ua
+        client_payload["ip"] = ip_addr
+    except Exception:
+        env.log_dict(name="client_error", action="{0}_malformed_payload".format(ping_type), message={
+            "ip": ip_addr,
+            "ua": ua,
+            "ver": 3,
+        })
+
+        env.statsd.incr("{0}_error".format(ping_type))
+        return Response('', content_type='application/json; charset=utf-8',
+                        status=400)
+
+    env.log_dict(name="application", action="activity_stream", message=client_payload)
+
+    env.statsd.incr("{0}".format(ping_type))
+    return Response('', content_type='application/json; charset=utf-8',
+                    status=200)
 
 
 def register_routes(app):
