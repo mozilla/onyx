@@ -1,3 +1,8 @@
+1.4.17
+======
+
+* Issue #35 - Add endpoint for Activity Stream
+
 1.4.16
 ======
 
