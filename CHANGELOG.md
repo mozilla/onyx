@@ -1,3 +1,8 @@
+1.4.18
+======
+
+* Upgrade gevent to 1.1.0 to fix the ssl issue
+
 1.4.17
 ======
 
