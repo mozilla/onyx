@@ -1,3 +1,8 @@
+1.4.19
+======
+
+* Extract action field from activity stream payload
+
 1.4.18
 ======
 
