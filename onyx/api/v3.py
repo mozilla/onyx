@@ -129,10 +129,12 @@ def activity_stream():
     ip_addr = None
     ua = None
     ping_type = 'activity_stream'
+    action = None
 
     try:
         client_payload_raw = request.get_data(cache=False)
         client_payload = ujson.decode(client_payload_raw)
+        action = client_payload["action"]  # treat it as malformed payload if "action" is missing
 
         ip_addr = request.headers.get('X-Forwarded-For')
         if ip_addr is None:
@@ -152,7 +154,7 @@ def activity_stream():
         return Response('', content_type='application/json; charset=utf-8',
                         status=400)
 
-    env.log_dict(name="application", action="activity_stream", message=client_payload)
+    env.log_dict(name="application", action=action, message=client_payload)
 
     env.statsd.incr("{0}".format(ping_type))
     return Response('', content_type='application/json; charset=utf-8',

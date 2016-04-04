@@ -271,6 +271,6 @@ class TestActivityStreamPing(BaseTestCase):
         response = self.client.post(url_for('v3_links.activity_stream'),
                                     content_type='application/json',
                                     headers=[("User-Agent", "TestClient")],
-                                    data=json.dumps({"data": "test"}))
+                                    data=json.dumps({"data": "test", "action": "activity_stream_session"}))
         assert_equals(response.status_code, 200)
         assert_equals(response.content_length, 0)
