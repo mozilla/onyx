@@ -122,13 +122,9 @@ def click():
     return handle_ping("click", api_version="3")
 
 
-@links.route('/activity-stream', methods=['POST'])
-@env.statsd.timer('v3_links_activity_stream')
-def activity_stream():
-    """Log activity stream ping sent from Firefox on each session"""
+def handle_activity_stream_ping(ping_type, log_name):
     ip_addr = None
     ua = None
-    ping_type = 'activity_stream'
     action = None
 
     try:
@@ -154,11 +150,25 @@ def activity_stream():
         return Response('', content_type='application/json; charset=utf-8',
                         status=400)
 
-    env.log_dict(name="application", action=action, message=client_payload)
+    env.log_dict(name=log_name, action=action, message=client_payload)
 
     env.statsd.incr("{0}".format(ping_type))
     return Response('', content_type='application/json; charset=utf-8',
                     status=200)
+
+
+@links.route('/activity-stream', methods=['POST'])
+@env.statsd.timer('v3_links_activity_stream')
+def activity_stream():
+    """Log activity stream ping sent from Firefox on each session"""
+    return handle_activity_stream_ping("activity_stream", "application")
+
+
+@links.route('/activity-stream-mobile', methods=['POST'])
+@env.statsd.timer('v3_links_activity_stream_mobile')
+def activity_stream_mobile():
+    """Log activity stream ping sent from Firefox mobile devices on each session"""
+    return handle_activity_stream_ping("activity_stream_mobile", "activity_stream_mobile")
 
 
 def register_routes(app):
