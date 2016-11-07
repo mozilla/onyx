@@ -160,6 +160,7 @@ Method: POST
 Example Payload:
 
     {
+      "action": "activity_stream_session",
       "client_id": "some_client_id",
       "addon_version": "1.0",
       "tab_id": 1,
@@ -183,6 +184,7 @@ Method: POST
 Example Payload:
 
     {
+      "action": "activity_stream_mobile_session",
       "client_id": "some_client_id",
       "addon_version": "1.0",
       "tab_id": 1,
