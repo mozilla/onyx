@@ -1,9 +1,47 @@
-# onyx
+# Onyx
 
-[![Build Status](https://travis-ci.org/oyiptong/onyx.svg?branch=master)](https://travis-ci.org/oyiptong/onyx)
+[![Build Status](https://travis-ci.org/mozilla/onyx.svg?branch=master)](https://travis-ci.org/mozilla/onyx)
 [![Coverage Status](https://coveralls.io/repos/oyiptong/onyx/badge.png?branch=master)](https://coveralls.io/r/oyiptong/onyx?branch=master)
 
 Link server and engagement metrics aggregator for Firefox Directory Links
+
+# Install
+```sh
+# install Onyx in a local Python virtualenv
+$ ./setup-project.sh
+
+# run the dev server at localhost:5000
+$ manage.py runserver
+
+# ping the server
+$ curl -v localhost:5000/__heartbeat__
+```
+
+# Run within docker
+
+You can run Onyx within docker (Note: *NOT* for production).
+
+```sh
+# build the Onyx docker image locally
+$ make docker
+
+# run the container at localhost:5000
+$ make run
+
+# tail the logs
+$ make log
+
+# stop the container
+$ make stop
+
+# start the stopped container
+$ make start
+
+# remove the container
+$ make clean
+```
+
+# Links
 
 There are a few API endpoints we care about:
 
