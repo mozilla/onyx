@@ -66,7 +66,7 @@ class DefaultConfig(object):
                 'socktype': socket.SOCK_DGRAM,
             }
         },
-        'activity_stream_mobile': {
+        'ping_centre': {
             'handler': logging.handlers.SysLogHandler,
             'format': '%(message)s',
             'level': logging.INFO,

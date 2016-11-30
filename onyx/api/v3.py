@@ -164,11 +164,45 @@ def activity_stream():
     return handle_activity_stream_ping("activity_stream", "application")
 
 
-@links.route('/activity-stream-mobile', methods=['POST'])
-@env.statsd.timer('v3_links_activity_stream_mobile')
-def activity_stream_mobile():
-    """Log activity stream ping sent from Firefox mobile devices on each session"""
-    return handle_activity_stream_ping("activity_stream_mobile", "activity_stream_mobile")
+def handle_ping_centre_ping(ping_type, log_name):
+    ip_addr = None
+    ua = None
+
+    try:
+        client_payload_raw = request.get_data(cache=False)
+        client_payload = ujson.decode(client_payload_raw)
+        assert 'topic' in client_payload  # treat it as malformed payload if "topic" is missing
+
+        ip_addr = request.headers.get('X-Forwarded-For')
+        if ip_addr is None:
+            ip_addr = request.remote_addr
+
+        ua = request.headers.get('User-Agent')
+        client_payload["ua"] = ua
+        client_payload["ip"] = ip_addr
+    except Exception:
+        env.log_dict(name="client_error", action="{0}_malformed_payload".format(ping_type), message={
+            "ip": ip_addr,
+            "ua": ua,
+            "ver": 3,
+        })
+
+        env.statsd.incr("{0}_error".format(ping_type))
+        return Response('', content_type='application/json; charset=utf-8',
+                        status=400)
+
+    env.log_dict(name=log_name, action="ping_centre", message=client_payload)
+
+    env.statsd.incr("{0}".format(ping_type))
+    return Response('', content_type='application/json; charset=utf-8',
+                    status=200)
+
+
+@links.route('/ping-centre', methods=['POST'])
+@env.statsd.timer('v3_links_ping_centre')
+def ping_centre():
+    """Log ping-centre ping sent from Firefox users on each session"""
+    return handle_ping_centre_ping("ping_centre", "ping_centre")
 
 
 def register_routes(app):

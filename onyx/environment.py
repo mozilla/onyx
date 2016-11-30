@@ -92,8 +92,12 @@ class Environment(object):
         now = datetime.utcnow()
         if action:
             message['action'] = action
-        message['date'] = now.date().isoformat()
-        message['timestamp'] = int(unix_time_millis(now))
+
+        # only populate 'date' and 'timestamp' if they're missing
+        if 'date' not in message:
+            message['date'] = now.date().isoformat()
+        if 'timestamp' not in message:
+            message['timestamp'] = int(unix_time_millis(now))
 
         msg = ujson.dumps(message)
         if self.config.LOG_HANDLERS[name]['handler'] == logging.handlers.SysLogHandler:

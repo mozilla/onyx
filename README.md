@@ -15,7 +15,7 @@ There are a few API endpoints we care about:
 * [/v3/links/view](#v3linksview)
 * [/v3/links/click](#v3linksclick)
 * [/v3/links/activity-stream](#v3linksactivity-stream)
-* [/v3/links/activity-stream-mobile](#v3linksactivity-stream-mobile)
+* [/v3/links/ping-centre](#v3linksping-centre)
 
 ## /v2/links/fetch/`locale`
 
@@ -175,26 +175,26 @@ Example Payload:
       "unload_reason": "click"  # ["click", "search", "close", "unfocus"]
     }
 
-## /v3/links/activity-stream-mobile
+## /v3/links/ping-centre
 
-The `activity-stream-mobile` endpoint captures any event takes place in the mobile Activity Stream devices.
+The `ping-centre` endpoint captures any event defined in the [Ping-centre](https://github.com/mozilla/ping-centre) repo.
 
 Method: POST
 
 Example Payload:
 
     {
-      "action": "activity_stream_mobile_session",
+      "topic": "activity_stream_mobile_session",
       "client_id": "some_client_id",
       "addon_version": "1.0",
       "tab_id": 1,
-      "load_reason": "newtab",  #["newtab", "focus", "restore"]
-      "source": "activity_stream",  #["recent_links", "recent_bookmarks", "frecent_links", "top_sites", "spotlight"]
+      "load_reason": "newtab",
+      "source": "activity_stream",
       "search": 0,  # indicates a search was performed
       "max_scroll_depth": 100,
       "click_position": 2,
       "total_bookmarks": 5,
       "total_history_size": 1000,
       "session_duration": 2000,
-      "unload_reason": "click"  # ["click", "search", "close", "unfocus"]
+      "unload_reason": "click"
     }
