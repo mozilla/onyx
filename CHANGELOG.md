@@ -1,3 +1,8 @@
+1.4.21
+======
+
+* Issue #42 - Rename the Activity Stream mobile endpoint to Ping-centre
+
 1.4.20
 ======
 
