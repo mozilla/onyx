@@ -54,6 +54,7 @@ There are a few API endpoints we care about:
 * [/v3/links/click](#v3linksclick)
 * [/v3/links/activity-stream](#v3linksactivity-stream)
 * [/v3/links/ping-centre](#v3linksping-centre)
+* [/v4/links/activity-stream](#v4linksactivity-stream)
 
 ## /v2/links/fetch/`locale`
 
@@ -235,4 +236,28 @@ Example Payload:
       "total_history_size": 1000,
       "session_duration": 2000,
       "unload_reason": "click"
+    }
+
+## /v4/links/activity-stream
+
+The `activity-stream` endpoint captures any event takes place in the Activity Stream system addon.
+
+Method: POST
+
+Example Payload:
+
+    {
+      "action": "activity_stream_session",
+      "client_id": "some_client_id",
+      "addon_version": "1.0",
+      "tab_id": 1,
+      "load_reason": "newtab",  #["newtab", "focus", "restore"]
+      "source": "activity_stream",  #["recent_links", "recent_bookmarks", "frecent_links", "top_sites", "spotlight"]
+      "search": 0,  # indicates a search was performed
+      "max_scroll_depth": 100,
+      "click_position": 2,  #[TBD, index of object clicked on a click event or -1? or 2D coordinates e.g. 200x400?]
+      "total_bookmarks": 5,
+      "total_history_size": 1000,
+      "session_duration": 2000,
+      "unload_reason": "click"  # ["click", "search", "close", "unfocus"]
     }
