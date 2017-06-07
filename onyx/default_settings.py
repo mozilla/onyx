@@ -76,6 +76,16 @@ class DefaultConfig(object):
                 'socktype': socket.SOCK_DGRAM,
             }
         },
+        'activity_stream': {
+            'handler': logging.handlers.SysLogHandler,
+            'format': '%(message)s',
+            'level': logging.INFO,
+            'params': {
+                'address': ('localhost', 514),
+                'facility': logging.handlers.SysLogHandler.LOG_LOCAL4,
+                'socktype': socket.SOCK_DGRAM,
+            }
+        },
         'console': {
             'handler': logging.StreamHandler,
             'level': logging.DEBUG,
