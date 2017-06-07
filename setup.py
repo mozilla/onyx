@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="onyx",
-    version="1.4.21",
+    version="1.4.22",
     description="Link server and engagement metrics " +
                 "aggregator for Firefox Directory Links",
     author="Mozilla",

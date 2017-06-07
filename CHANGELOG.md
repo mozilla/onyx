@@ -1,3 +1,8 @@
+1.4.22
+======
+
+* Issue #46 - Add a v4 endpoint for Activity Stream system addon
+
 1.4.21
 ======
 
