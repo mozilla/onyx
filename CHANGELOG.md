@@ -1,3 +1,8 @@
+1.4.23
+======
+
+* Issue #48 - Add a endpoint for Activity Stream CSP report
+
 1.4.22
 ======
 
