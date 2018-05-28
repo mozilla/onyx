@@ -1,3 +1,8 @@
+1.4.24
+======
+
+* Issue #51 - Extract action field from ping-centre ping
+
 1.4.23
 ======
 
