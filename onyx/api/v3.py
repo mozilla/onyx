@@ -172,6 +172,7 @@ def handle_ping_centre_ping(ping_type, log_name):
         client_payload_raw = request.get_data(cache=False)
         client_payload = ujson.decode(client_payload_raw)
         assert 'topic' in client_payload  # treat it as malformed payload if "topic" is missing
+        action = client_payload.get("action", "ping_centre")
 
         ip_addr = request.headers.get('X-Forwarded-For')
         if ip_addr is None:
@@ -191,7 +192,7 @@ def handle_ping_centre_ping(ping_type, log_name):
         return Response('', content_type='application/json; charset=utf-8',
                         status=400)
 
-    env.log_dict(name=log_name, action="ping_centre", message=client_payload)
+    env.log_dict(name=log_name, action=action, message=client_payload)
 
     env.statsd.incr("{0}".format(ping_type))
     return Response('', content_type='application/json; charset=utf-8',

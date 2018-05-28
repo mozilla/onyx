@@ -293,9 +293,14 @@ class TestPingCentrePing(BaseTestCase):
         assert_equals(response.content_length, 0)
 
     def test_payload_meta(self):
+        payload = {
+            "data": "test",
+            "action": "ping_centre_action",
+            "topic": "activity_stream_mobile_session"
+        }
         response = self.client.post(url_for('v3_links.ping_centre'),
                                     content_type='application/json',
                                     headers=[("User-Agent", "TestClient")],
-                                    data=json.dumps({"data": "test", "topic": "activity_stream_mobile_session"}))
+                                    data=json.dumps(payload))
         assert_equals(response.status_code, 200)
         assert_equals(response.content_length, 0)
